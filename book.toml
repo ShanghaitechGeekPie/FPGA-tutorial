@@ -1,0 +1,9 @@
+[book]
+authors = ["dingjr"]
+language = "zh-cn"
+multilingual = false
+src = "src"
+title = "FPGA Tutorial"
+
+[output.html]
+git-repository-url = "https://github.com/ShanghaitechGeekPie/FPGA-tutorial"

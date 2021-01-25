@@ -1,0 +1,275 @@
+<!DOCTYPE HTML>
+<html lang="zh-cn" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Intro to 嵌入式点灯工程师 - FPGA Tutorial</title>
+        
+        
+
+
+        <!-- Custom HTML head -->
+        
+
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        
+        <link rel="icon" href="../favicon.svg">
+        
+        
+        <link rel="shortcut icon" href="../favicon.png">
+        
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        
+        <link rel="stylesheet" href="../css/print.css" media="print">
+        
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        
+        <link rel="stylesheet" href="../fonts/fonts.css">
+        
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../index.html"><strong aria-hidden="true">1.</strong> 前言</a></li><li class="chapter-item expanded "><a href="../fpga_intro/fpga_intro.html" class="active"><strong aria-hidden="true">2.</strong> Intro to 嵌入式点灯工程师</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../fpga_intro/hdl.html"><strong aria-hidden="true">2.1.</strong> 编写HDL</a></li><li class="chapter-item expanded "><a href="../fpga_intro/ip.html"><strong aria-hidden="true">2.2.</strong> 添加IP</a></li><li class="chapter-item expanded "><a href="../fpga_intro/simulation_program.html"><strong aria-hidden="true">2.3.</strong> 仿真与下载</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
+
+                    <h1 class="menu-title">FPGA Tutorial</h1>
+
+                    <div class="right-buttons">
+                        
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                        
+                        <a href="https://github.com/ShanghaitechGeekPie/FPGA-tutorial" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#intro-to-嵌入式点灯工程师" id="intro-to-嵌入式点灯工程师">Intro to 嵌入式点灯工程师</a></h1>
+<p>在开始正式学习FPGA前，我们先通过一个简单的例子来看看FPGA的开发流程是怎样的，FPGA与单片机又有什么区别。</p>
+<h2><a class="header" href="#开发板的选购" id="开发板的选购">开发板的选购</a></h2>
+<p>FPGA的主要厂商包括Altera与Xilinx，至少在以前是这样的。然后在某一天Altera被Intel收购了，接着Xilinx被AMD收购了。于是这又变成牙膏厂和农企之间的争斗了。</p>
+<p>由于FPGA并不像软件开发拥有众多的开源项目，开发依赖特定厂商的工具，本文使用XIlinx的Vivado进行开发。Xilinx生产两种类型的FPGA，一种是纯FPGA，一类是FPGA与Arm的结合体，也就是ZYNQ系列。极其推荐使用ZYNQ的理由是你可以同时学习FPGA和ARM的开发流程，更可以学习如何用FPGA辅助ARM运算，非常划算。本文使用的是Xilinx的ZYNQ 7010系列的开发板。</p>
+<h2><a class="header" href="#vivado的安装" id="vivado的安装">Vivado的安装</a></h2>
+<p>Vivado是用来开发Xilinx（现AMD）FPGA的开发套件。其中主要包括，Vivado——hdl开发测试，集成ip等、Vitis——Arm核心软件开发、Vitis(HLS)——用于进行高层次综合语言（HLS）的开发与DocNav用来查找阅览开发文档。</p>
+<p><img src="pic/vivado_install.png" alt="" />
+如果你的安装空间足够大，建议Design Tools和Devices都勾选上，其他保持默认。如果不够，在Vitis Unified Software Platform中一定要勾选Vivada和Vitis。在Devices中一定要勾选开发板对应的型号。</p>
+<h2><a class="header" href="#创建项目" id="创建项目">创建项目</a></h2>
+<p>在打开Vivado之后，应该是这样的。点击Quick Start栏目中的Create Project。</p>
+<p><img src="pic/vivado_new.png" alt="" /></p>
+<p>项目名称任意，注意在Project Type中选择RTL Project。</p>
+<p><img src="pic/vivado_new_1.png" alt="" /></p>
+<p>然后点击Next，知道你见到如下画面。<strong>这里非常重要。</strong> 这里选择的是你开发板的型号，咨询你开发板的客服或者查找他们给的资料。</p>
+<p><img src="pic/vivado_new_2.png" alt="" /></p>
+<p>最后点击Finish完成创建。顺利的话，你会见到下面的画面。我们注意到在左侧有Flow Navigator，这里展示了FPGA开发中所有的流程，并且已经按照顺序罗列好了。</p>
+<p><img src="pic/vivado_flow.png" alt="" /></p>
+<h3><a class="header" href="#project-manager" id="project-manager">Project Manager</a></h3>
+<p>FPGA是通过硬件描述语言(<strong>H</strong>ardware <strong>D</strong>escription <strong>L</strong>anguage)进行开发的。HDL包括SystemVerilog，Verilog，VHDL以及Chisel3。SystemVerilog与Verilog的关系就是c和c++之间的关系，所以本文并不区分他们，均以verilog统称。VHDL将在EE115、EE116中介绍。Chisel3的教程可见<a href="https://www.chisel-lang.org/">chisel-lang</a>。本文主要以Verilog为主，会提供简单的Verilog教程，涵盖大部分可综合的verilog，和小部分不可综合的verilog。</p>
+<p>毫无疑问，开发FPGA的第一步就是编写HDL了。</p>
+<h3><a class="header" href="#ip-integrator" id="ip-integrator">IP Integrator</a></h3>
+<p>IP是(<strong>I</strong>ntellectual <strong>P</strong>roperty)的缩写。一个比较有名的IP提供商就是ARM了。ARM并不生产任何芯片，却能通过授权IP给其他芯片厂商以此获利。当然我们所使用的IP并不都像ARM提供的那么复杂，比如在之后我们所使用的用于生成各种频率时钟的IP。</p>
+<p>IP节省了开发、验证时间，提高了开发速度。</p>
+<h3><a class="header" href="#simulation" id="simulation">Simulation</a></h3>
+<p>仿真是为了检查错误，它的作用相当于编程中的断点调试。当然，随着集成电路规模的发展，除了仿真之外也有其他验证方法，比如SystemVerilog的UVM，比如形式化验证。关于SV的验证，可以参考《SystemVerilog for Verification》。相对于其他方法，仿真可以给你一种更加直观的感受，推测问题出在哪里。</p>
+<p>仿真的重要性不言而喻，随着工作流程的推近，修改一个bug的成本是递增的。对于FPGA来说，如果已经交付厂家生产，还能通过重写程序来修改。而对于ASIC来说，如果已经流片了，那就可以准备破产了。这也是为什么我们希望尽早消灭错误。</p>
+<h3><a class="header" href="#rtl-analysis" id="rtl-analysis">RTL Analysis</a></h3>
+<p>RTL是(<strong>R</strong>egister <strong>T</strong>ransfer <strong>L</strong>evel)的缩写，意味使用寄存器这一级别来表示数字电路。而HDL大多是在行为层面描述电路，更加抽象。</p>
+<p>RTL分析则是通过分析生成的电路来查看编写的HDL是否有问题。</p>
+<h3><a class="header" href="#synthesis" id="synthesis">Synthesis</a></h3>
+<p>Synthesis直译为综合，在这一步，HDL被综合成网表(Net List)。网表是比RTL更低级的表示形式，它们通常由可以生产的最小单元组成。你可以理解为门电路。</p>
+<h3><a class="header" href="#implementation" id="implementation">Implementation</a></h3>
+<p>这一步，HDL终于被真正的变成了硬件。在这一步，Vivado根据生成的网表，通过算法解和约束推测出一个最优的布局和连线。这个最优取决于你的选择，你可以选择功耗优先，频率优先等。这个约束有引脚约束与时序约束等。</p>
+<h3><a class="header" href="#program-and-debug" id="program-and-debug">Program and Debug</a></h3>
+<p>在Implementation结束后，就可以下载到FPGA中运行了。FPGA是通过二进制文件进行编程的，这和编译生成汇编是类似的。</p>
+<p>除了通过示波器观察波形，Vivado还支持在FPGA内配置一个示波器连接电脑展示波形。不过这会占用FPGA的可编程的面积。</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="../index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="../fpga_intro/hdl.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a rel="prev" href="../index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a rel="next" href="../fpga_intro/hdl.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>

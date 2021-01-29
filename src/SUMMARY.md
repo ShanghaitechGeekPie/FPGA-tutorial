@@ -3,4 +3,3 @@
 - [Intro to 嵌入式点灯工程师](./fpga_intro/fpga_intro.md)
   - [编写HDL](./fpga_intro/hdl.md)
   - [添加IP](./fpga_intro/ip.md)
-  - [仿真与下载](./fpga_intro/simulation_program.md)

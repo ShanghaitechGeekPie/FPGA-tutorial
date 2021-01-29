@@ -97,7 +97,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="index.html"><strong aria-hidden="true">1.</strong> 前言</a></li><li class="chapter-item expanded "><a href="fpga_intro/fpga_intro.html"><strong aria-hidden="true">2.</strong> Intro to 嵌入式点灯工程师</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="fpga_intro/hdl.html"><strong aria-hidden="true">2.1.</strong> 编写HDL</a></li><li class="chapter-item expanded "><a href="fpga_intro/ip.html"><strong aria-hidden="true">2.2.</strong> 添加IP</a></li><li class="chapter-item expanded "><a href="fpga_intro/simulation_program.html"><strong aria-hidden="true">2.3.</strong> 仿真与下载</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="index.html"><strong aria-hidden="true">1.</strong> 前言</a></li><li class="chapter-item expanded "><a href="fpga_intro/fpga_intro.html"><strong aria-hidden="true">2.</strong> Intro to 嵌入式点灯工程师</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="fpga_intro/hdl.html"><strong aria-hidden="true">2.1.</strong> 编写HDL</a></li><li class="chapter-item expanded "><a href="fpga_intro/ip.html"><strong aria-hidden="true">2.2.</strong> 添加IP</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -243,161 +243,77 @@ EE115 Topic 1 Introduction.ppt p34</p>
 <h3><a class="header" href="#program-and-debug" id="program-and-debug">Program and Debug</a></h3>
 <p>在Implementation结束后，就可以下载到FPGA中运行了。FPGA是通过二进制文件进行编程的，这和编译生成汇编是类似的。</p>
 <p>除了通过示波器观察波形，Vivado还支持在FPGA内配置一个示波器连接电脑展示波形。不过这会占用FPGA的可编程的面积。</p>
-<h2><a class="header" href="#闪烁的led" id="闪烁的led">闪烁的LED</a></h2>
-<pre><code class="language-verilog">module HelloWorld(
-    input wire clk_in,
-    output wire OnBoardLED
+<h1><a class="header" href="#编写hdl" id="编写hdl">编写HDL</a></h1>
+<p>点击Project Manager下的Add Source，</p>
+<p><img src="fpga_intro/pic/vivado_source.png" alt="" /></p>
+<p>点击next，选择Create File。在弹出的窗口中选择SystemVerilog，名称任意。</p>
+<p><img src="fpga_intro/pic/vivado_source_2.png" alt="" /></p>
+<p>点击Finish。在弹出的Define Module中创建一个名为clk的input信号和名为led的output信号。点击Ok。</p>
+<p><img src="fpga_intro/pic/vivado_source_3.png" alt="" /></p>
+<p>在Design Source下多出一个文件(*.sv)，sv代表SystemVerilog。点击它。</p>
+<p><img src="fpga_intro/pic/vivado_source_4.png" alt="" /></p>
+<p>我们发现里面会有一大堆注释和这段语句。这段语句定义了这个Module的输入输出。而在module与endmodule中间，是我们描述整个硬件行为的部分。我们之前定义了两个信号，led毫无疑问会连接到开发板上LED，并控制LED的闪烁。而clk是输入信号，这是做什么的呢？clk是clock的简写，代表时钟。时钟是数字电路的“心脏”。在每个时钟周期内，数字电路都会完成一次运算。CPU中的主频，实际上就是说的时钟信号的频率。</p>
+<pre><code class="language-verilog">module led(
+    input clk,
+    output led
     );
-    reg [21:0] freq_div;
-	assign OnBoardLED= freq_div[21];
-	always @(posedge clk_in) begin
-		freq_div &lt;= freq_div + 1'd1;
-	end
 endmodule
 </code></pre>
-<p>在引言中提及，FPGA的出现是因为设计大规模数字电路的需求。为了描述大规模的数字电路，人们研发出硬件描述语言（HDL）如Verilog、VHDL。 </p>
-<p>我们现在不知道如何去写，但并不妨碍我们来看看它的每一行是什么意思。</p>
-<pre><code class="language-verilog">module HelloWorld(
-    input wire clk_in,
-    output wire OnBoardLED
+<p>我们修改代码如下，并保存。</p>
+<pre><code class="language-verilog">module led(
+    input clk,
+    output logic led
     );
-</code></pre>
-<p>在代码的开始定义了这个模块的输入与输出。这个模块的输入名为clk_in，输出名为OnBoardLED。这里输入输出的类型都为Wire，由于Verilog是硬件描述语言，<strong>它代表着一个电路</strong>。这里的Wire对应着电路的一条线。clk是clock的缩写，连接着外部的晶振。晶振可以提供一个周期性的方波，它的电压随时间变化的波形如下。在数字电路中，我们不关心具体的电压，而是将低电压称为0，高电压称为1。于是晶振可以看作在0与1间反复变化。OnBoardLED连接着板载LED。</p>
-<p><img src="https://github.com/ShanghaitechGeekPie/FPGA-tutorial/raw/master/docs/zh-cn/pic/fpga-intro/%E6%96%B9%E6%B3%A2.png" alt="" /></p>
-<pre><code class="language-verilog">reg [21:0] freq_div;
-assign OnBoardLED= freq_div[21];
-</code></pre>
-<p>接下来的一行代码定义了一个22位的寄存器（Reg）。寄存器是什么将在之后解释，如果你学习过任意编程语言，在此你可以将它理解为一个长度为22的数组，数组的类型为bool。接着我们用assign关键字将输出OnBoardLED连接到这个数组的最高位。由于<strong>它代表着一个电路</strong>，这里实际上会在电路中将它们连接在一起。</p>
-<pre><code class="language-verilog">always @(posedge clk_in) begin
-	freq_div &lt;= freq_div + 1'd1;
-end
-</code></pre>
-<p>这里使用了always关键字，它的作用是在时钟信号的上升沿执行begin end内的代码。上升沿（posedge）是指方波由0变为1的过程，而下降沿（negedge）则是由1变为0的过程。always与软件中回调（callback）概念很类似，它代表了实际电路中的一个触发器。这里在每一个上升沿的时候将寄存器加一。可以想象的是，随着不断的加一，寄存器中低位会进位到高位，也就是在某个时刻最高位会变成1，即LED发光。而由于没有比22位更高的位数了，当22位想进位时，它仅仅会变为0而不会改变其他事情，此时LED熄灭。如此反复，于是LED就可以闪烁了。 </p>
-<p>值得注意的我们完全可以直接将晶振连接到OnBoardLED上，也可以使OnBoardLED在低电压和高电压之间反复变化。然而晶振的频率很高，肉眼完全无法观察。所以我们通过这种方法降低频率。</p>
-<h3><a class="header" href="#管脚约束" id="管脚约束">管脚约束</a></h3>
-<p>在写完Verilog代码后，我们所需要做的事情还没有结束。我们只是描述了内部电路，而这个程序要与外部的晶振与LED连接。注意clk_in与OnBoardLED只是我们取的名字，程序并不知道clk_in连接着晶振。所以我们需要写ucf来进行管脚约束或称管脚分配，告诉程序如何连接外部电路。</p>
-<pre><code class="language-ucf">NET clk_in LOC = &quot;P8&quot;
-NET OnBoardLED LOC = &quot;L7&quot;
-</code></pre>
-<p>这其中的P8与L7指的是FPGA芯片的引脚，而这个引脚连接的器件完全由开发板决定。查阅你的开发板资料就可以找到。现实中的管脚约束远非如此简单，如果你要做差分输出，那么你显然要做更多的配置。可见管脚分配也是非常重要的一部。直接书写并不一定简单，有时可以通过可视化工具来实现同样的工作。</p>
-<p><img src="https://github.com/ShanghaitechGeekPie/FPGA-tutorial/raw/master/docs/zh-cn/pic/fpga-intro/%E7%AE%A1%E8%84%9A%E7%BA%A6%E6%9D%9F.png" alt="" /> </p>
-<h3><a class="header" href="#仿真" id="仿真">仿真</a></h3>
-<p>对于我们想要的电路，我们描述的已经很完整了。那么，如何验证我们程序的正确性呢？要知道，硬件开发和软件开发是不一样。对于软件开发，如果发现问题，你只要修改重新编译。然而，如果硬件出了问题，你可没办法把集成电路拆开重新调整电路。所以，仿真在电路开发中有着很重要的地位。 </p>
-<p>System Verilog不仅提供了描述电路的能力，也提供了仿真电路的能力。由于System Verilog是Verilog的超集，所以在讲授时，我们不区分两者，以Verilog统称。</p>
-<pre><code class="language-verilog">module HelloWorldTest;
-	// Inputs
-	reg clk_in;
-	// Outputs
-	wire OnBoardLED;
-	// Instantiate the Unit Under Test (UUT)
-	HelloWorld uut (
-		.clk_in(clk_in), 
-		.OnBoardLED(OnBoardLED)
-	);
-	initial begin
-		// Initialize Inputs
-		clk_in = 0;
-		// Wait 100 ns for global reset to finish
-		#100;    
-		forever 
-			#(10/2) clk_in = ~clk_in;  
-		// Add stimulus here
-	end      
+    always_ff@(posedge clk)begin
+        led &lt;= ~led;
+    end
 endmodule
 </code></pre>
-<p>我们来看看每一行都是什么意思。</p>
-<pre><code class="language-verilog">reg clk_in;
-wire OnBoardLED;
-</code></pre>
-<p>这里我们申明了两个变量。由于这是仿真程序，我们不能真的通过一根导线将fpga与外部电路连接在一起，所以我们创建一个寄存器clk_in用来模拟晶振的效果。</p>
-<pre><code class="language-verilog">HelloWorld uut(
-		.clk_in(clk_in), 
-		.OnBoardLED(OnBoardLED)
-	);
-</code></pre>
-<p>如果你学过OOP，那你会发现这个和类的初始化很相似。这里我们创建了一个HelloWorld模块，并将clk_in连到定义的寄存器clk_in，将OnBoardLED连接到一根导线。由于电路中模块之间的连接很重要，很多时候我们不采用按照顺序传入参数，而是直接点名接口的名称，减少因此产生的错误。</p>
-<pre><code class="language-verilog">initial begin
-	clk_in = 0;
-	forever 
-		#(10/2) clk_in = ~clk_in; 
-end
-</code></pre>
-<p>在这里我们模拟晶振的输出。通过initial关键字表明这是仿真程序的入口。在开始我们初始化了clk_in。并通过forever关键字反复执行<code>#(10/2) clk_in = ~clk_in;</code>。<code>#(10/2)</code>代表间隔10/2个时间单位运行一次后面的代码。而<code>clk_in = ~clk_in;</code>通过非操作符使clk_in反复在1与0之间变化，以此模拟晶振。
-以下是以上程序的仿真。 </p>
-<p><img src="https://github.com/ShanghaitechGeekPie/FPGA-tutorial/raw/master/docs/zh-cn/pic/fpga-intro/%E4%BB%BF%E7%9C%9F%E9%94%99%E8%AF%AF.png" alt="" /> </p>
-<p>尽管这个程序能在FPGA板运行，但我们发现OnBoardLED并非我们预期的在1与0之间反复跳动，而是显示的X。X被用来表示一个没有初始化的值。仔细观察我们写的程序，我们发现<code>reg [21:0] freq_div;</code>定义了一个寄存器却没有初始化它的值。对于实际电路，这个寄存器中的值是不确定的，虽然对于我们简单的示例来说无关紧要，但很多时候这会造成严重后果。（想想C++中的内存错误！）</p>
-<p>修改程序为</p>
-<pre><code class="language-verilog">module HelloWorld(
-    input wire clk_in,
-    output wire OnBoardLED
-    );
-    reg [21:0] freq_div = 1'd0;
-	assign OnBoardLED= freq_div[21];
-	always @(posedge clk_in) begin
-		freq_div &lt;= freq_div + 1'd1;
-	end
-endmodule
-</code></pre>
-<p>再次运行我们的仿真，得到如下结果 </p>
-<p><img src="https://github.com/ShanghaitechGeekPie/FPGA-tutorial/raw/master/docs/zh-cn/pic/fpga-intro/%E4%BB%BF%E7%9C%9F.png" alt="" /> </p>
-<p>可以看到变量OnBoardLED的波形在0与1之间反复跳动，且周期差不多为21ms，人眼可以接受的范围。我们的程序编写的正确了。</p>
-<h2><a class="header" href="#下一步" id="下一步">下一步？</a></h2>
-<p>在做好了人应该做的事情后，接下来的事情就可以交给机器了。点击软件的综合（Synthesize），综合你的电路。
-那么在这个过程中发生了什么呢？你或许听说过非门、与门、或门，这是组成现实中数字电路的积木。而设计数字电路的过程如同搭积木的过程。在之前说过，Verilog等语言出现是为了抽象具体细节提高开发速度。Verilog语言并不直接对应这些器件，所以eda先通过算法将Verilog转化为这些器件的组合，这一步就是我们所说的综合。</p>
-<p><img src="https://github.com/ShanghaitechGeekPie/FPGA-tutorial/raw/master/docs/zh-cn/pic/fpga-intro/RTL1.png" alt="" /> </p>
-<p>可以看出我们所写的代码被综合为一个略微复杂的电路，如果手动设计，显然会花费比我们多许多的时间。主要原因是因为有一个21位的寄存器。我们可以将它合并为一个整体。</p>
-<p><img src="https://github.com/ShanghaitechGeekPie/FPGA-tutorial/raw/master/docs/zh-cn/pic/fpga-intro/RTL2.png" alt="" /> </p>
-<p>接着点击软件的实现（implementation）。</p>
-<p><img src="https://github.com/ShanghaitechGeekPie/FPGA-tutorial/raw/master/docs/zh-cn/pic/fpga-intro/%E5%AE%9E%E7%8E%B0.png" alt="" /> </p>
-<p>可以看出实现里面又分为Map，Place &amp; Route。如何摆放上一步生成的器件是现在的主要问题。大部分时候我们希望这些器件之间的连线越短越好，或是运算速度越快越好，有时我们希望某跟导线连接到芯片的某个引脚上。摆放器件和连线的过程被称为实现。</p>
-<p>让我们通过MinecraftHDL来复习一下这个过程，它可以将Verilog等语言转换为Minecraft中的红石逻辑电路。<a href="https://github.com/itsFrank/MinecraftHDL" title="MinecraftHDL">https://github.com/itsFrank/MinecraftHDL</a></p>
-<p>在minecraft中，你可以通过游戏机制来实现门电路，也就是我们所说的组成数字电路的器件。 </p>
-<p><img src="https://github.com/ShanghaitechGeekPie/FPGA-tutorial/raw/master/docs/zh-cn/pic/fpga-intro/minecraft_logic.png" alt="" /> </p>
-<p>随后这个mod通过一个开源的Verilog综合套件Yosys将Verilog代码转换成由门电路来表达的形式。接着通过一些简单的算法完成布局和连线。 </p>
-<p><img src="https://github.com/ShanghaitechGeekPie/FPGA-tutorial/raw/master/docs/zh-cn/pic/fpga-intro/minecraftHDL.png" alt="" /> </p>
-<p>那么在下载到FPGA后又发生了什么呢？这要从FPGA的构造说起了，FPGA是由许多小的逻辑单元构成的，这些逻辑单元实际上是由查找表（LUT）构成的。查找表可以理解为一张表格，存有每个输入对应着的输出。在数字电路中，可以用真值表来表示不同数字器件。而查找表存储的实际上就是这些数字器件的真值表。</p>
-<p><img src="https://github.com/ShanghaitechGeekPie/FPGA-tutorial/raw/master/docs/zh-cn/pic/fpga-intro/LogicCell.gif" alt="" /> </p>
-<p>在配置的过程中，FPGA根据前两步生成的二进制文件配置每个查找表，随后将它们连接在一起。</p>
-<p><img src="https://github.com/ShanghaitechGeekPie/FPGA-tutorial/raw/master/docs/zh-cn/pic/fpga-intro/LogicCells.gif" alt="" /> </p>
-<p>当然有些查找表可能和IO连接在一起，这就是我们之前所说的管脚约束。</p>
-<p><img src="https://github.com/ShanghaitechGeekPie/FPGA-tutorial/raw/master/docs/zh-cn/pic/fpga-intro/LogicCells_IOs.gif" alt="" /> </p>
-<h2><a class="header" href="#回顾fpga的开发流程" id="回顾fpga的开发流程">回顾FPGA的开发流程</a></h2>
-<p>FPGA的开发流程如下: </p>
-<ul>
-<li>告诉程序你想要的<strong>数字电路</strong>。你可以画一个电路图，或者使用硬件描述语言来描述。</li>
-<li>使用EDA综合。这一步会产生一个二进制文件，将它下载到你的FPGA里。</li>
-<li>成功了！如果足够幸运，你的FPGA就会像你想的那样工作。 </li>
-</ul>
-<p>值得注意的是： </p>
-<ul>
-<li>FPGA可以无限次的修改，或者说“烧录”。如果你发现程序有问题，只要修改重新下载就可以了。</li>
-<li>与软件不同，我们称HDL变成二进制的文件的过程为**综合（synthesis）与实现（implementation）<strong>而不是“编译”，称下载到FPGA的过程为</strong>配置（configuration）**而不是“烧录”。这与FPGA工作原理相关。</li>
-<li>断电后FPGA会失去配置的程序（像计算机中RAM）。不过可以通过外接FLASH等方法固化程序，但这没有改变FPGA断电失去程序的特性，只是在每次上电时重新配置了。 </li>
-</ul>
-<h2><a class="header" href="#单片机是如何实现led的闪烁" id="单片机是如何实现led的闪烁">单片机是如何实现LED的闪烁</a></h2>
-<p>最后我们再来看看单片机是如何实现的。</p>
-<pre><code class="language-c">#include &quot;reg51.h&quot;
-sbit Led0=P2^0;
-void main(void)
-{
-	P2=0xFF;
-	while(1)
-	{
-		Led0=1;
-		Delay();
-		Led0=0;
-		Delay();
-	}
-}
-</code></pre>
-<p>这段代码通过编译器变成机器码，储存在ROM中。开始执行的时候，内部有个程序计数器(PC)，告诉单片机从哪个地址取指令。单片机内的IO口映射到操作特殊功能寄存器（SFR），然后通过修改特殊功能寄存器来改变IO口的电平。 </p>
-<p>可以看出的是对于单片机来说，每一种操作都对应着底层固定的流程，单片机仅仅可以实现指令集中的操作。对于更加复杂的操作，则是通过更高层的抽象，则是通过高级语言比如C、Java、Python来实现的。</p>
-<p>而FPGA则不同，每一段HDL代码都直接对应着至少一种数字电路。这种电路的结构并不一定是单片机以及大部分计算机的图灵架构。这使得FPGA可以针对某一种算法进行优化，可以做到单片机做不到的并行计算。这种灵活性使得FPGA在加速人工智能上有所建树。</p>
+<p>这段代码描述了什么样的电路呢？我们可以通过RTL Analysis来查看结果。点击Open Elaborated Design。右侧就是我们的RTL设计。RTL_REG会在clk的上升沿，将D的数据输入到Q。这个由
+<code>always_ff@(posedge clk)</code>描述。而RTL_INV负责将Q的数据取反然后输入到D，取反意味着1会变成0，vice versa。这意味着在每一个时钟上升沿，led的值都会变化，产生LED闪烁的效果。</p>
+<p><img src="fpga_intro/pic/vivado_rtl.png" alt="" /></p>
+<h2><a class="header" href="#综合" id="综合">综合</a></h2>
+<p>点击左侧的Run Synthesis，在弹出的窗口点击Ok。等待综合完成</p>
+<p><img src="fpga_intro/pic/vivado_synthesis.png" alt="" /></p>
+<p>选择Open Synthesized Design，点击OK。或者在左边点击Open Synthesized Design。</p>
+<p><img src="fpga_intro/pic/vivado_synthesis_1.png" alt="" /></p>
+<p>我们此时就可以看到电路被综合以后的结果。BUF是为了隔离其他电路对这部分电路的影响，包括提高驱动能力，降低延迟等。FDRE表明这首先是一个D触发器，接着它是同步使能，同步复位。FDRE的D与Q代表数据的输入与输出。C表示时钟信号。这与我们在上一个电路图中看到的是一致的。多出来的CE代表时钟使能，R表示复位。它们永远保持在一个状态，与我们的电路无关，所以不会出现在上一幅图中。但是如果要实现出来确实必要的。上一幅图中的反相器被一个叫LUT的替换了，LUT是查找表的意思，是FPGA实现组合逻辑的一种方式。</p>
+<p><img src="fpga_intro/pic/vivado_synthesis_2.png" alt="" /></p>
+<p>可见综合后的电路是可以被真正实现的，因此包含了更多的细节。这些细节是与我们电路功能不太相关的，因此可以在设计的时候被忽略的。</p>
+<h2><a class="header" href="#实现" id="实现">实现</a></h2>
+<p>点击左侧的Run Implementation，在弹出的窗口点击Ok。等待实现完成</p>
+<p><img src="fpga_intro/pic/vivado_impl.png" alt="" /></p>
+<p>和之前一样打开Implemented Design，就可以看到这个程序真正在FPGA上实现的结果了。选择Leaf Cell下面的LUT，点击工具栏里的Routing Resources，然后放大到那个位置。这就是我们整个程序主体的实现结果。可以看见图中选中的即为synthesized design中的LUT，而另一个蓝色方块为FDRE。绿色代表它们之间的连线。</p>
+<p><img src="fpga_intro/pic/vivado_impl_2.png" alt="" /></p>
+<h2><a class="header" href="#生成bitstream与下载" id="生成bitstream与下载">生成bitstream与下载</a></h2>
+<p>这时候我们就已经到了整个的设计流程的最后一步，下载程序。和之前一样点击Generate Bitstream，然后点击Ok。我们马上就见到了报错。生成失败了！这是为什么呢？</p>
+<p><img src="fpga_intro/pic/vivado_gen.png" alt="" /></p>
+<p>查看Log与Message，我们发现了几条重要线索。</p>
+<p>Message(Error):</p>
 <blockquote>
-<p>https://www.fpga4fun.com/FPGAinfo2.html<br />
-https://zhuanlan.zhihu.com/p/69415960<br />
-'Digital Design and Computer Architecture (Second Edition)'  </p>
+<p>[DRC NSTD-1] <strong>Unspecified I/O Standard</strong>: 2 out of 2 logical ports use I/O standard (IOSTANDARD) value 'DEFAULT', instead of a user assigned specific value. This may cause I/O contention or incompatibility with the board power or connectivity affecting performance, signal integrity or in extreme cases cause damage to the device or the components to which it is connected. To correct this violation, specify all I/O standards. This design will fail to generate a bitstream unless all logical ports have a user specified I/O standard value defined. To allow bitstream creation with unspecified I/O standard values (not recommended), use this command: set_property SEVERITY {Warning} [get_drc_checks NSTD-1].  NOTE: When using the Vivado Runs infrastructure (e.g. launch_runs Tcl command), add this command to a .tcl file and add that file as a pre-hook for write_bitstream step for the implementation run. Problem ports: <strong>clk</strong>, and <strong>led</strong>.</p>
 </blockquote>
+<p>这是什么意思呢？我们看不懂，然而抓取关键字我们知道这是和I/O有关系，而且这个报错是关于clk和led这两个信号的。继续debug，我们发现还有几个warning。</p>
+<p>massage(warning):
+&gt;[Constraints 18-5210] <strong>No constraints selected for write.</strong> Resolution: This message can indicate that there are no constraints for the design, or it can indicate that the used_in flags are set such that the constraints are ignored. This later case is used when running synth_design to not write synthesis constraints to the resulting checkpoint. Instead, project constraints are read when the synthesized design is opened.</p>
+<p>原来这个错误可能和没有约束文件有关系。约束文件是干什么的呢？HDL只能描述FPGA内的电路的行为，对于其它则没有能力去描述。比如我希望某个信号是连接到外部IO口，比如我希望某一段电路的延迟小于某个数值。这时候就需要约束文件去描述了。</p>
+<p>重新打开Synthesized Design。点击I/O Pins，随后修改Package Pin与I/O std。这对于每个开发板都是不一样的，这需要查找原理图才能知道。注意如果是Zynq，时钟信号要连接到PL端的时钟。</p>
+<p><img src="fpga_intro/pic/vivado_synthesis_3.png" alt="" /></p>
+<p>Ctrl+s保存，在弹出的窗口修改名称，点击OK。</p>
+<p><img src="fpga_intro/pic/vivado_synthesis_4.png" alt="" /></p>
+<p>我们可以发现，在Sources窗口下的Constraints里面多了一个*.xdc的文件。它的内容正好对应我们修改的内容。</p>
+<pre><code>set_property IOSTANDARD LVCMOS33 [get_ports clk]
+set_property IOSTANDARD LVCMOS33 [get_ports led]
+set_property PACKAGE_PIN N18 [get_ports clk]
+set_property PACKAGE_PIN P15 [get_ports led]
+</code></pre>
+<p>此时就可以重新点击Generate Bitstream。等待重新综合和实现完成。这个时候插入你的开发板，然后选择Open Hardware Manager，点击Ok。</p>
+<p><img src="fpga_intro/pic/vivado_hardware.png" alt="" /></p>
+<p>选择Open Target，然后选择Auto Connect。此时应该会连接上你的设备。</p>
+<p><img src="fpga_intro/pic/vivado_hardware_2.png" alt="" /></p>
+<p>然后选择Program Device，在弹出的窗口里选择Program。就可以下载了。</p>
+<p><img src="fpga_intro/pic/vivado_hardware_3.png" alt="" /></p>
+<p>这时候如果一切正常，你会发现LED一直发光。什！为什么不是闪烁？问题出在哪里？</p>
 
                     </main>
 

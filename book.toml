@@ -7,3 +7,4 @@ title = "FPGA Tutorial"
 
 [output.html]
 git-repository-url = "https://github.com/ShanghaitechGeekPie/FPGA-tutorial"
+mathjax-support = true

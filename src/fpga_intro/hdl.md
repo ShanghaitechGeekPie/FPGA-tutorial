@@ -41,7 +41,67 @@ endmodule
 
 ![](pic/vivado_rtl.png)
 
-## 综合
+# 仿真
+在编写完HDL后，第一件应该做的就是仿真了。在debug程序时，我们都要给程序一个输入，然后观察输出是什么，以此来寻找程序的bug。在仿真数字电路，同理我们需要激励（输入），来观察响应（输出）是否正确。而这一切都体现在波形图上。
+
+现在我们来创建一个激励，点击Add Sources，选择Add or Create Simulation Resources。点击Next。
+
+![](pic/vivado_sim.png)
+
+点击Create File，创建一个SV类型的文件，名称随意。
+
+![](pic/vivado_sim_2.png)
+
+在Simulation Resources中找到我们刚刚创建的文件。
+
+![](pic/vivado_sim_3.png)
+
+修改其内容为，
+
+```verilog
+module led_sim();
+
+logic clk,led;
+
+led a(
+    .clk(clk),
+    .led(led)
+);
+
+initial begin
+    clk = 0;
+    forever #(10) clk = ~clk;
+end
+endmodule
+```
+
+接着点击Simulation中Run Simulation下的Run Behavioral Simulation。在菜单栏点击Run for 1ns，然后点击缩小按钮，直到能看见clk的波形不再是一条直线。
+
+此时问题来了，clk的波形是红色的，而且它的值是X。
+
+![](pic/vivado_sim_4.png)
+
+原来verilog中logic类型并不只有两种状态，而是有四种状态。
+
+|值|含义|
+|-|-|
+|0|低电压|
+|1|高电压|
+|Z|高阻态|
+|X|错误|
+
+所以我们的程序出现了错误。问题在哪里？原来是led没有初始化。所谓初始化就是它的初值是不确定的，而之后`led <= ~led `是依赖于初值的，所以led之后的值就不确定。修改如下
+
+```verilog
+output logic led=0
+````
+
+保存后，点击菜单中的Relaunch Simulation。观察到led的波形终于会在0与1之间跳动了，我们程序的行为终于正确了。
+
+![](pic/vivado_sim_5.png)
+
+
+# 综合
 点击左侧的Run Synthesis，在弹出的窗口点击Ok。等待综合完成
 
 ![](pic/vivado_synthesis.png)
@@ -56,7 +116,7 @@ endmodule
 
 可见综合后的电路是可以被真正实现的，因此包含了更多的细节。这些细节是与我们电路功能不太相关的，因此可以在设计的时候被忽略的。
 
-## 实现
+# 实现
 点击左侧的Run Implementation，在弹出的窗口点击Ok。等待实现完成
 
 ![](pic/vivado_impl.png)
@@ -65,7 +125,7 @@ endmodule
 
 ![](pic/vivado_impl_2.png)
 
-## 生成bitstream与下载
+# 生成bitstream与下载
 这时候我们就已经到了整个的设计流程的最后一步，下载程序。和之前一样点击Generate Bitstream，然后点击Ok。我们马上就见到了报错。生成失败了！这是为什么呢？
 
 ![](pic/vivado_gen.png)
@@ -78,7 +138,7 @@ Message(Error):
 这是什么意思呢？我们看不懂，然而抓取关键字我们知道这是和I/O有关系，而且这个报错是关于clk和led这两个信号的。继续debug，我们发现还有几个warning。
 
 massage(warning):
->[Constraints 18-5210] **No constraints selected for write.** Resolution: This message can indicate that there are no constraints for the design, or it can indicate that the used_in flags are set such that the constraints are ignored. This later case is used when running synth_design to not write synthesis constraints to the resulting checkpoint. Instead, project constraints are read when the synthesized design is opened.
+> [Constraints 18-5210] **No constraints selected for write.** Resolution: This message can indicate that there are no constraints for the design, or it can indicate that the used_in flags are set such that the constraints are ignored. This later case is used when running synth_design to not write synthesis constraints to the resulting checkpoint. Instead, project constraints are read when the synthesized design is opened.
 
 原来这个错误可能和没有约束文件有关系。约束文件是干什么的呢？HDL只能描述FPGA内的电路的行为，对于其它则没有能力去描述。比如我希望某个信号是连接到外部IO口，比如我希望某一段电路的延迟小于某个数值。这时候就需要约束文件去描述了。
 
@@ -111,4 +171,6 @@ set_property PACKAGE_PIN P15 [get_ports led]
 
 ![](pic/vivado_hardware_3.png)
 
-这时候如果一切正常，你会发现LED一直发光。什！为什么不是闪烁？问题出在哪里？
+这时候如果一切正常，你会发现LED一直发光。
+
+什！为什么不是闪烁？问题出在哪里？

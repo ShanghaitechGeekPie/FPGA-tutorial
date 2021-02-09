@@ -1,0 +1,305 @@
+<!DOCTYPE HTML>
+<html lang="zh-cn" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>verilog语法基础 - FPGA Tutorial</title>
+        
+        
+
+
+        <!-- Custom HTML head -->
+        
+
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        
+        <link rel="icon" href="../favicon.svg">
+        
+        
+        <link rel="shortcut icon" href="../favicon.png">
+        
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        
+        <link rel="stylesheet" href="../css/print.css" media="print">
+        
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        
+        <link rel="stylesheet" href="../fonts/fonts.css">
+        
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+        <!-- MathJax -->
+        <script async type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../index.html"><strong aria-hidden="true">1.</strong> 前言</a></li><li class="chapter-item expanded "><a href="../fpga_intro/fpga_intro.html"><strong aria-hidden="true">2.</strong> Intro to 嵌入式点灯工程师</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../fpga_intro/hdl.html"><strong aria-hidden="true">2.1.</strong> 编写HDL</a></li><li class="chapter-item expanded "><a href="../fpga_intro/ip.html"><strong aria-hidden="true">2.2.</strong> “优化”</a></li></ol></li><li class="chapter-item expanded "><a href="../verilog/basic_syntax.html" class="active"><strong aria-hidden="true">3.</strong> verilog语法基础</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../verilog/circuit_modelling.html"><strong aria-hidden="true">3.1.</strong> 电路建模</a></li><li class="chapter-item expanded "><a href="../verilog/hierarchy_construction.html"><strong aria-hidden="true">3.2.</strong> 层次构建</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
+
+                    <h1 class="menu-title">FPGA Tutorial</h1>
+
+                    <div class="right-buttons">
+                        
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                        
+                        <a href="https://github.com/ShanghaitechGeekPie/FPGA-tutorial" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#verilog语法基础" id="verilog语法基础">verilog语法基础</a></h1>
+<p>在这一节中，我们将学习verilog的一些基础知识，随后才开始真正进入verilog的学习。</p>
+<h2><a class="header" href="#注释" id="注释">注释</a></h2>
+<p>verilog的注释方式与C完全一致。</p>
+<pre><code class="language-verilog">//这是一个注释
+</code></pre>
+<pre><code class="language-verilog">/*这个注释从这里开始
+阿巴阿巴
+这个注释在这里结束*/
+</code></pre>
+<h2><a class="header" href="#数字常量的表示方式" id="数字常量的表示方式">数字常量的表示方式</a></h2>
+<p>数字常量在逻辑电路有着很重要的意义，比如一个计数器需要在每一个上升沿加一，此时的做法就是将一个拉高电平（代表1）的导线和计数器的寄存器用加法器连接在一起，并接一个触发器。</p>
+<p>在编程中，常量储存在常量池中，与变量的存储方式基本一致。而在数字电路中，常量往往是用拉高电平（代表1）或拉低电平（代表0）来实现的。</p>
+<p>在Verilog中，数字常量关注三个量，位宽，基数与数字本身。比如十进制下三位宽的2，可以如下表示</p>
+<pre><code class="language-verilog">3'b010
+3'o2
+3'd2
+3'h2
+</code></pre>
+<p>可以发现先是位宽，然后是基数，基数可选的有二进制（d），八进制（o），十进制（d），十六进制（h），最后是对应基数下的数字。值得注意的是这里的位宽都是指二进制下的位宽。</p>
+<pre><code>[size]'[base][number]
+</code></pre>
+<p>当然如果可以由编译器直接推断位宽，此时可以忽略位宽。这种做法极为不推荐，仅在少数情况中使用，比如给一个向量初始化为全0。</p>
+<pre><code class="language-verilog">reg [3:0] a; //一个四位宽的向量a
+assign a= 'b0; //这个等价为4`b0000
+</code></pre>
+<p>甚至当你不关注于基数时，可以直接忽略，写成纯数字，此时采用的是十进制。</p>
+<pre><code class="language-verilog">2 
+</code></pre>
+<h2><a class="header" href="#数据类型" id="数据类型">数据类型</a></h2>
+<p>由于Verilog原来是用来仿真而不是描述硬件的，出于仿真的需求，数据类型总体分为net和variable两大类。</p>
+<p>net类用于表示导线结构，它不存储状态，只能负责传递驱动级的输出。常见的net类数据包括wire、tri、wand和supply0等。variable类设计用于表示存储结构，它内部存储状态。reg是最典型的variable类数据。</p>
+<table><thead><tr><th>net</th><th>variable</th></tr></thead><tbody>
+<tr><td>wire, tri ...</td><td>reg, integer ...</td></tr>
+</tbody></table>
+<p>最常用的两种类型是wire与reg。reg和编程语言中的变量是类似的，可以理解为开辟了一块区域用于存储数据。wire则不同，它表示数据的传递方向。在一个模块中，当数据从多个input流入，如何从output流出的过程可以用wire来描述。 </p>
+<p>但要注意的是wire与reg有可能不直接对应底层的电路，比如使用了reg，最后生成的电路中却是组合逻辑电路。也就是不包含任何状态储存元件的电路。</p>
+<pre><code class="language-verilog">module top_module(
+	input reg a,b,sel, //这里声明了四个reg变量
+	output reg c);
+
+always@(*)
+	if (sel) c=a;
+	else c=b;
+
+endmodule
+</code></pre>
+<p>这个代码生成的电路是一个选择器，在之后的学习中，我们可以用纯粹组合逻辑的方式实现一个选择器。</p>
+<p><img src="./pic/reg.png" alt="" /> </p>
+<p>为了解决这个问题，SystemVerilog引入了logic的概念，编译器会自行推断是wire还是reg。在大部分情况下，使用logic可以替代wire与reg，除了多驱动电路。所以上述代码可以改成。</p>
+<pre><code class="language-verilog">module top_module(input logic a,b,sel,output logic c);
+always@(*)
+	if (sel) c=a;
+	else c=b;
+endmodule
+</code></pre>
+<h3><a class="header" href="#变量可以储存哪些值" id="变量可以储存哪些值">变量可以储存哪些值</a></h3>
+<table><thead><tr><th>值</th><th>含义</th></tr></thead><tbody>
+<tr><td>0</td><td>表示逻辑上的否</td></tr>
+<tr><td>1</td><td>表示逻辑上的是</td></tr>
+<tr><td>x</td><td>表示一个未知的量（通常是一种错误）</td></tr>
+<tr><td>z</td><td>表示高阻态（此时状态由其他驱动决定）</td></tr>
+</tbody></table>
+<p>通常来说，0与1是我们最常用的，如果你需要多驱动电路，会用到Z。但是，一旦出现X，非常可能是一种错误，比如未初始化的寄存器。</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="../fpga_intro/ip.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="../verilog/circuit_modelling.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a rel="prev" href="../fpga_intro/ip.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a rel="next" href="../verilog/circuit_modelling.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>

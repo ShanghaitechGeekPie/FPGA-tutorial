@@ -45,6 +45,9 @@
         
 
         
+        <!-- MathJax -->
+        <script async type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
     </head>
     <body>
         <!-- Provide site root to javascript -->
@@ -95,7 +98,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="index.html" class="active"><strong aria-hidden="true">1.</strong> 前言</a></li><li class="chapter-item expanded "><a href="fpga_intro/fpga_intro.html"><strong aria-hidden="true">2.</strong> Intro to 嵌入式点灯工程师</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="fpga_intro/hdl.html"><strong aria-hidden="true">2.1.</strong> 编写HDL</a></li><li class="chapter-item expanded "><a href="fpga_intro/ip.html"><strong aria-hidden="true">2.2.</strong> 添加IP</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="index.html" class="active"><strong aria-hidden="true">1.</strong> 前言</a></li><li class="chapter-item expanded "><a href="fpga_intro/fpga_intro.html"><strong aria-hidden="true">2.</strong> Intro to 嵌入式点灯工程师</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="fpga_intro/hdl.html"><strong aria-hidden="true">2.1.</strong> 编写HDL</a></li><li class="chapter-item expanded "><a href="fpga_intro/ip.html"><strong aria-hidden="true">2.2.</strong> “优化”</a></li></ol></li><li class="chapter-item expanded "><a href="verilog/basic_syntax.html"><strong aria-hidden="true">3.</strong> verilog语法基础</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="verilog/circuit_modelling.html"><strong aria-hidden="true">3.1.</strong> 电路建模</a></li><li class="chapter-item expanded "><a href="verilog/hierarchy_construction.html"><strong aria-hidden="true">3.2.</strong> 层次构建</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -184,15 +187,7 @@
 <p>这个教程使用Xilinx的开发套件Vivado进行开发，所有工程文件都可以在src文件夹中找到。本教程包括：</p>
 <ul>
 <li>LED闪烁 FPGA开发流程简介</li>
-<li>数据类型 常量、变量与数组</li>
-<li>电路描述 组合逻辑与数字逻辑</li>
-<li>层次构建 搭建模块，构建体系架构</li>
-<li>ADC驱动电路 有限状态机</li>
-<li>PWM呼吸灯 SV for verification</li>
-<li>RTL分析 FPGA内部组成与工作原理</li>
-<li>HDMI驱动电路 FPGA用于高速接口</li>
-<li>PID算法 ZYNQ介绍：FPGA加速的单片机</li>
-<li>图像边缘识别 高层次综合语言（HLS）</li>
+<li>verilog语法简介</li>
 </ul>
 <p>如果读者在掌握了FPGA的一些用法后仍对FPGA有所兴趣，我校开设了几门与FPGA相关的课程，它们是：</p>
 <ul>

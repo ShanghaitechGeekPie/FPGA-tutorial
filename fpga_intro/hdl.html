@@ -45,6 +45,9 @@
         
 
         
+        <!-- MathJax -->
+        <script async type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
     </head>
     <body>
         <!-- Provide site root to javascript -->
@@ -95,7 +98,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../index.html"><strong aria-hidden="true">1.</strong> 前言</a></li><li class="chapter-item expanded "><a href="../fpga_intro/fpga_intro.html"><strong aria-hidden="true">2.</strong> Intro to 嵌入式点灯工程师</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../fpga_intro/hdl.html" class="active"><strong aria-hidden="true">2.1.</strong> 编写HDL</a></li><li class="chapter-item expanded "><a href="../fpga_intro/ip.html"><strong aria-hidden="true">2.2.</strong> 添加IP</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../index.html"><strong aria-hidden="true">1.</strong> 前言</a></li><li class="chapter-item expanded "><a href="../fpga_intro/fpga_intro.html"><strong aria-hidden="true">2.</strong> Intro to 嵌入式点灯工程师</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../fpga_intro/hdl.html" class="active"><strong aria-hidden="true">2.1.</strong> 编写HDL</a></li><li class="chapter-item expanded "><a href="../fpga_intro/ip.html"><strong aria-hidden="true">2.2.</strong> “优化”</a></li></ol></li><li class="chapter-item expanded "><a href="../verilog/basic_syntax.html"><strong aria-hidden="true">3.</strong> verilog语法基础</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../verilog/circuit_modelling.html"><strong aria-hidden="true">3.1.</strong> 电路建模</a></li><li class="chapter-item expanded "><a href="../verilog/hierarchy_construction.html"><strong aria-hidden="true">3.2.</strong> 层次构建</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -196,7 +199,46 @@ endmodule
 <p>这段代码描述了什么样的电路呢？我们可以通过RTL Analysis来查看结果。点击Open Elaborated Design。右侧就是我们的RTL设计。RTL_REG会在clk的上升沿，将D的数据输入到Q。这个由
 <code>always_ff@(posedge clk)</code>描述。而RTL_INV负责将Q的数据取反然后输入到D，取反意味着1会变成0，vice versa。这意味着在每一个时钟上升沿，led的值都会变化，产生LED闪烁的效果。</p>
 <p><img src="pic/vivado_rtl.png" alt="" /></p>
-<h2><a class="header" href="#综合" id="综合">综合</a></h2>
+<h1><a class="header" href="#仿真" id="仿真">仿真</a></h1>
+<p>在编写完HDL后，第一件应该做的就是仿真了。在debug程序时，我们都要给程序一个输入，然后观察输出是什么，以此来寻找程序的bug。在仿真数字电路，同理我们需要激励（输入），来观察响应（输出）是否正确。而这一切都体现在波形图上。</p>
+<p>现在我们来创建一个激励，点击Add Sources，选择Add or Create Simulation Resources。点击Next。</p>
+<p><img src="pic/vivado_sim.png" alt="" /></p>
+<p>点击Create File，创建一个SV类型的文件，名称随意。</p>
+<p><img src="pic/vivado_sim_2.png" alt="" /></p>
+<p>在Simulation Resources中找到我们刚刚创建的文件。</p>
+<p><img src="pic/vivado_sim_3.png" alt="" /></p>
+<p>修改其内容为，</p>
+<pre><code class="language-verilog">module led_sim();
+
+logic clk,led;
+
+led a(
+    .clk(clk),
+    .led(led)
+);
+
+initial begin
+    clk = 0;
+    forever #(10) clk = ~clk;
+end
+endmodule
+</code></pre>
+<p>接着点击Simulation中Run Simulation下的Run Behavioral Simulation。在菜单栏点击Run for 1ns，然后点击缩小按钮，直到能看见clk的波形不再是一条直线。</p>
+<p>此时问题来了，clk的波形是红色的，而且它的值是X。</p>
+<p><img src="pic/vivado_sim_4.png" alt="" /></p>
+<p>原来verilog中logic类型并不只有两种状态，而是有四种状态。</p>
+<table><thead><tr><th>值</th><th>含义</th></tr></thead><tbody>
+<tr><td>0</td><td>低电压</td></tr>
+<tr><td>1</td><td>高电压</td></tr>
+<tr><td>Z</td><td>高阻态</td></tr>
+<tr><td>X</td><td>错误</td></tr>
+</tbody></table>
+<p>所以我们的程序出现了错误。问题在哪里？原来是led没有初始化。所谓初始化就是它的初值是不确定的，而之后<code>led &lt;= ~led </code>是依赖于初值的，所以led之后的值就不确定。修改如下</p>
+<pre><code class="language-verilog">output logic led=0
+</code></pre>
+<p>保存后，点击菜单中的Relaunch Simulation。观察到led的波形终于会在0与1之间跳动了，我们程序的行为终于正确了。</p>
+<p><img src="pic/vivado_sim_5.png" alt="" /></p>
+<h1><a class="header" href="#综合" id="综合">综合</a></h1>
 <p>点击左侧的Run Synthesis，在弹出的窗口点击Ok。等待综合完成</p>
 <p><img src="pic/vivado_synthesis.png" alt="" /></p>
 <p>选择Open Synthesized Design，点击OK。或者在左边点击Open Synthesized Design。</p>
@@ -204,12 +246,12 @@ endmodule
 <p>我们此时就可以看到电路被综合以后的结果。BUF是为了隔离其他电路对这部分电路的影响，包括提高驱动能力，降低延迟等。FDRE表明这首先是一个D触发器，接着它是同步使能，同步复位。FDRE的D与Q代表数据的输入与输出。C表示时钟信号。这与我们在上一个电路图中看到的是一致的。多出来的CE代表时钟使能，R表示复位。它们永远保持在一个状态，与我们的电路无关，所以不会出现在上一幅图中。但是如果要实现出来确实必要的。上一幅图中的反相器被一个叫LUT的替换了，LUT是查找表的意思，是FPGA实现组合逻辑的一种方式。</p>
 <p><img src="pic/vivado_synthesis_2.png" alt="" /></p>
 <p>可见综合后的电路是可以被真正实现的，因此包含了更多的细节。这些细节是与我们电路功能不太相关的，因此可以在设计的时候被忽略的。</p>
-<h2><a class="header" href="#实现" id="实现">实现</a></h2>
+<h1><a class="header" href="#实现" id="实现">实现</a></h1>
 <p>点击左侧的Run Implementation，在弹出的窗口点击Ok。等待实现完成</p>
 <p><img src="pic/vivado_impl.png" alt="" /></p>
 <p>和之前一样打开Implemented Design，就可以看到这个程序真正在FPGA上实现的结果了。选择Leaf Cell下面的LUT，点击工具栏里的Routing Resources，然后放大到那个位置。这就是我们整个程序主体的实现结果。可以看见图中选中的即为synthesized design中的LUT，而另一个蓝色方块为FDRE。绿色代表它们之间的连线。</p>
 <p><img src="pic/vivado_impl_2.png" alt="" /></p>
-<h2><a class="header" href="#生成bitstream与下载" id="生成bitstream与下载">生成bitstream与下载</a></h2>
+<h1><a class="header" href="#生成bitstream与下载" id="生成bitstream与下载">生成bitstream与下载</a></h1>
 <p>这时候我们就已经到了整个的设计流程的最后一步，下载程序。和之前一样点击Generate Bitstream，然后点击Ok。我们马上就见到了报错。生成失败了！这是为什么呢？</p>
 <p><img src="pic/vivado_gen.png" alt="" /></p>
 <p>查看Log与Message，我们发现了几条重要线索。</p>
@@ -218,8 +260,10 @@ endmodule
 <p>[DRC NSTD-1] <strong>Unspecified I/O Standard</strong>: 2 out of 2 logical ports use I/O standard (IOSTANDARD) value 'DEFAULT', instead of a user assigned specific value. This may cause I/O contention or incompatibility with the board power or connectivity affecting performance, signal integrity or in extreme cases cause damage to the device or the components to which it is connected. To correct this violation, specify all I/O standards. This design will fail to generate a bitstream unless all logical ports have a user specified I/O standard value defined. To allow bitstream creation with unspecified I/O standard values (not recommended), use this command: set_property SEVERITY {Warning} [get_drc_checks NSTD-1].  NOTE: When using the Vivado Runs infrastructure (e.g. launch_runs Tcl command), add this command to a .tcl file and add that file as a pre-hook for write_bitstream step for the implementation run. Problem ports: <strong>clk</strong>, and <strong>led</strong>.</p>
 </blockquote>
 <p>这是什么意思呢？我们看不懂，然而抓取关键字我们知道这是和I/O有关系，而且这个报错是关于clk和led这两个信号的。继续debug，我们发现还有几个warning。</p>
-<p>massage(warning):
-&gt;[Constraints 18-5210] <strong>No constraints selected for write.</strong> Resolution: This message can indicate that there are no constraints for the design, or it can indicate that the used_in flags are set such that the constraints are ignored. This later case is used when running synth_design to not write synthesis constraints to the resulting checkpoint. Instead, project constraints are read when the synthesized design is opened.</p>
+<p>massage(warning):</p>
+<blockquote>
+<p>[Constraints 18-5210] <strong>No constraints selected for write.</strong> Resolution: This message can indicate that there are no constraints for the design, or it can indicate that the used_in flags are set such that the constraints are ignored. This later case is used when running synth_design to not write synthesis constraints to the resulting checkpoint. Instead, project constraints are read when the synthesized design is opened.</p>
+</blockquote>
 <p>原来这个错误可能和没有约束文件有关系。约束文件是干什么的呢？HDL只能描述FPGA内的电路的行为，对于其它则没有能力去描述。比如我希望某个信号是连接到外部IO口，比如我希望某一段电路的延迟小于某个数值。这时候就需要约束文件去描述了。</p>
 <p>重新打开Synthesized Design。点击I/O Pins，随后修改Package Pin与I/O std。这对于每个开发板都是不一样的，这需要查找原理图才能知道。注意如果是Zynq，时钟信号要连接到PL端的时钟。</p>
 <p><img src="pic/vivado_synthesis_3.png" alt="" /></p>
@@ -237,7 +281,8 @@ set_property PACKAGE_PIN P15 [get_ports led]
 <p><img src="pic/vivado_hardware_2.png" alt="" /></p>
 <p>然后选择Program Device，在弹出的窗口里选择Program。就可以下载了。</p>
 <p><img src="pic/vivado_hardware_3.png" alt="" /></p>
-<p>这时候如果一切正常，你会发现LED一直发光。什！为什么不是闪烁？问题出在哪里？</p>
+<p>这时候如果一切正常，你会发现LED一直发光。</p>
+<p>什！为什么不是闪烁？问题出在哪里？</p>
 
                     </main>
 

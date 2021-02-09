@@ -1,0 +1,23 @@
+#-----------------------------------------------------------
+# Vivado v2020.2 (64-bit)
+# SW Build 3064766 on Wed Nov 18 09:12:45 MST 2020
+# IP Build 3064653 on Wed Nov 18 14:17:31 MST 2020
+# Start of session at: Tue Feb  9 22:29:37 2021
+# Process ID: 7720
+# Current directory: F:/FPGA-tutorial/src/fpga_intro
+# Command line: vivado.exe -gui_launcher_event rodinguilauncherevent4952 F:\FPGA-tutorial\src\fpga_intro\fpga_intro.xpr
+# Log file: F:/FPGA-tutorial/src/fpga_intro/vivado.log
+# Journal file: F:/FPGA-tutorial/src/fpga_intro\vivado.jou
+#-----------------------------------------------------------
+start_gui
+open_project F:/FPGA-tutorial/src/fpga_intro/fpga_intro.xpr
+Scanning sources...
+Finished scanning sources
+WARNING: [Project 1-509] GeneratedRun file for 'synth_1' not found
+WARNING: [Project 1-509] GeneratedRun file for 'impl_1' not found
+INFO: [IP_Flow 19-234] Refreshing IP repositories
+INFO: [IP_Flow 19-1704] No user IP repositories specified
+INFO: [IP_Flow 19-2313] Loaded Vivado IP repository 'C:/Xilinx/Vivado/2020.2/data/ip'.
+update_compile_order -fileset sources_1
+exit
+INFO: [Common 17-206] Exiting Vivado at Tue Feb  9 22:30:07 2021...

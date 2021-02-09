@@ -47,6 +47,9 @@
         
 
         
+        <!-- MathJax -->
+        <script async type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
     </head>
     <body>
         <!-- Provide site root to javascript -->
@@ -97,7 +100,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="index.html"><strong aria-hidden="true">1.</strong> 前言</a></li><li class="chapter-item expanded "><a href="fpga_intro/fpga_intro.html"><strong aria-hidden="true">2.</strong> Intro to 嵌入式点灯工程师</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="fpga_intro/hdl.html"><strong aria-hidden="true">2.1.</strong> 编写HDL</a></li><li class="chapter-item expanded "><a href="fpga_intro/ip.html"><strong aria-hidden="true">2.2.</strong> 添加IP</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="index.html"><strong aria-hidden="true">1.</strong> 前言</a></li><li class="chapter-item expanded "><a href="fpga_intro/fpga_intro.html"><strong aria-hidden="true">2.</strong> Intro to 嵌入式点灯工程师</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="fpga_intro/hdl.html"><strong aria-hidden="true">2.1.</strong> 编写HDL</a></li><li class="chapter-item expanded "><a href="fpga_intro/ip.html"><strong aria-hidden="true">2.2.</strong> “优化”</a></li></ol></li><li class="chapter-item expanded "><a href="verilog/basic_syntax.html"><strong aria-hidden="true">3.</strong> verilog语法基础</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="verilog/circuit_modelling.html"><strong aria-hidden="true">3.1.</strong> 电路建模</a></li><li class="chapter-item expanded "><a href="verilog/hierarchy_construction.html"><strong aria-hidden="true">3.2.</strong> 层次构建</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -186,15 +189,7 @@
 <p>这个教程使用Xilinx的开发套件Vivado进行开发，所有工程文件都可以在src文件夹中找到。本教程包括：</p>
 <ul>
 <li>LED闪烁 FPGA开发流程简介</li>
-<li>数据类型 常量、变量与数组</li>
-<li>电路描述 组合逻辑与数字逻辑</li>
-<li>层次构建 搭建模块，构建体系架构</li>
-<li>ADC驱动电路 有限状态机</li>
-<li>PWM呼吸灯 SV for verification</li>
-<li>RTL分析 FPGA内部组成与工作原理</li>
-<li>HDMI驱动电路 FPGA用于高速接口</li>
-<li>PID算法 ZYNQ介绍：FPGA加速的单片机</li>
-<li>图像边缘识别 高层次综合语言（HLS）</li>
+<li>verilog语法简介</li>
 </ul>
 <p>如果读者在掌握了FPGA的一些用法后仍对FPGA有所兴趣，我校开设了几门与FPGA相关的课程，它们是：</p>
 <ul>
@@ -272,7 +267,46 @@ endmodule
 <p>这段代码描述了什么样的电路呢？我们可以通过RTL Analysis来查看结果。点击Open Elaborated Design。右侧就是我们的RTL设计。RTL_REG会在clk的上升沿，将D的数据输入到Q。这个由
 <code>always_ff@(posedge clk)</code>描述。而RTL_INV负责将Q的数据取反然后输入到D，取反意味着1会变成0，vice versa。这意味着在每一个时钟上升沿，led的值都会变化，产生LED闪烁的效果。</p>
 <p><img src="fpga_intro/pic/vivado_rtl.png" alt="" /></p>
-<h2><a class="header" href="#综合" id="综合">综合</a></h2>
+<h1><a class="header" href="#仿真" id="仿真">仿真</a></h1>
+<p>在编写完HDL后，第一件应该做的就是仿真了。在debug程序时，我们都要给程序一个输入，然后观察输出是什么，以此来寻找程序的bug。在仿真数字电路，同理我们需要激励（输入），来观察响应（输出）是否正确。而这一切都体现在波形图上。</p>
+<p>现在我们来创建一个激励，点击Add Sources，选择Add or Create Simulation Resources。点击Next。</p>
+<p><img src="fpga_intro/pic/vivado_sim.png" alt="" /></p>
+<p>点击Create File，创建一个SV类型的文件，名称随意。</p>
+<p><img src="fpga_intro/pic/vivado_sim_2.png" alt="" /></p>
+<p>在Simulation Resources中找到我们刚刚创建的文件。</p>
+<p><img src="fpga_intro/pic/vivado_sim_3.png" alt="" /></p>
+<p>修改其内容为，</p>
+<pre><code class="language-verilog">module led_sim();
+
+logic clk,led;
+
+led a(
+    .clk(clk),
+    .led(led)
+);
+
+initial begin
+    clk = 0;
+    forever #(10) clk = ~clk;
+end
+endmodule
+</code></pre>
+<p>接着点击Simulation中Run Simulation下的Run Behavioral Simulation。在菜单栏点击Run for 1ns，然后点击缩小按钮，直到能看见clk的波形不再是一条直线。</p>
+<p>此时问题来了，clk的波形是红色的，而且它的值是X。</p>
+<p><img src="fpga_intro/pic/vivado_sim_4.png" alt="" /></p>
+<p>原来verilog中logic类型并不只有两种状态，而是有四种状态。</p>
+<table><thead><tr><th>值</th><th>含义</th></tr></thead><tbody>
+<tr><td>0</td><td>低电压</td></tr>
+<tr><td>1</td><td>高电压</td></tr>
+<tr><td>Z</td><td>高阻态</td></tr>
+<tr><td>X</td><td>错误</td></tr>
+</tbody></table>
+<p>所以我们的程序出现了错误。问题在哪里？原来是led没有初始化。所谓初始化就是它的初值是不确定的，而之后<code>led &lt;= ~led </code>是依赖于初值的，所以led之后的值就不确定。修改如下</p>
+<pre><code class="language-verilog">output logic led=0
+</code></pre>
+<p>保存后，点击菜单中的Relaunch Simulation。观察到led的波形终于会在0与1之间跳动了，我们程序的行为终于正确了。</p>
+<p><img src="fpga_intro/pic/vivado_sim_5.png" alt="" /></p>
+<h1><a class="header" href="#综合" id="综合">综合</a></h1>
 <p>点击左侧的Run Synthesis，在弹出的窗口点击Ok。等待综合完成</p>
 <p><img src="fpga_intro/pic/vivado_synthesis.png" alt="" /></p>
 <p>选择Open Synthesized Design，点击OK。或者在左边点击Open Synthesized Design。</p>
@@ -280,12 +314,12 @@ endmodule
 <p>我们此时就可以看到电路被综合以后的结果。BUF是为了隔离其他电路对这部分电路的影响，包括提高驱动能力，降低延迟等。FDRE表明这首先是一个D触发器，接着它是同步使能，同步复位。FDRE的D与Q代表数据的输入与输出。C表示时钟信号。这与我们在上一个电路图中看到的是一致的。多出来的CE代表时钟使能，R表示复位。它们永远保持在一个状态，与我们的电路无关，所以不会出现在上一幅图中。但是如果要实现出来确实必要的。上一幅图中的反相器被一个叫LUT的替换了，LUT是查找表的意思，是FPGA实现组合逻辑的一种方式。</p>
 <p><img src="fpga_intro/pic/vivado_synthesis_2.png" alt="" /></p>
 <p>可见综合后的电路是可以被真正实现的，因此包含了更多的细节。这些细节是与我们电路功能不太相关的，因此可以在设计的时候被忽略的。</p>
-<h2><a class="header" href="#实现" id="实现">实现</a></h2>
+<h1><a class="header" href="#实现" id="实现">实现</a></h1>
 <p>点击左侧的Run Implementation，在弹出的窗口点击Ok。等待实现完成</p>
 <p><img src="fpga_intro/pic/vivado_impl.png" alt="" /></p>
 <p>和之前一样打开Implemented Design，就可以看到这个程序真正在FPGA上实现的结果了。选择Leaf Cell下面的LUT，点击工具栏里的Routing Resources，然后放大到那个位置。这就是我们整个程序主体的实现结果。可以看见图中选中的即为synthesized design中的LUT，而另一个蓝色方块为FDRE。绿色代表它们之间的连线。</p>
 <p><img src="fpga_intro/pic/vivado_impl_2.png" alt="" /></p>
-<h2><a class="header" href="#生成bitstream与下载" id="生成bitstream与下载">生成bitstream与下载</a></h2>
+<h1><a class="header" href="#生成bitstream与下载" id="生成bitstream与下载">生成bitstream与下载</a></h1>
 <p>这时候我们就已经到了整个的设计流程的最后一步，下载程序。和之前一样点击Generate Bitstream，然后点击Ok。我们马上就见到了报错。生成失败了！这是为什么呢？</p>
 <p><img src="fpga_intro/pic/vivado_gen.png" alt="" /></p>
 <p>查看Log与Message，我们发现了几条重要线索。</p>
@@ -294,8 +328,10 @@ endmodule
 <p>[DRC NSTD-1] <strong>Unspecified I/O Standard</strong>: 2 out of 2 logical ports use I/O standard (IOSTANDARD) value 'DEFAULT', instead of a user assigned specific value. This may cause I/O contention or incompatibility with the board power or connectivity affecting performance, signal integrity or in extreme cases cause damage to the device or the components to which it is connected. To correct this violation, specify all I/O standards. This design will fail to generate a bitstream unless all logical ports have a user specified I/O standard value defined. To allow bitstream creation with unspecified I/O standard values (not recommended), use this command: set_property SEVERITY {Warning} [get_drc_checks NSTD-1].  NOTE: When using the Vivado Runs infrastructure (e.g. launch_runs Tcl command), add this command to a .tcl file and add that file as a pre-hook for write_bitstream step for the implementation run. Problem ports: <strong>clk</strong>, and <strong>led</strong>.</p>
 </blockquote>
 <p>这是什么意思呢？我们看不懂，然而抓取关键字我们知道这是和I/O有关系，而且这个报错是关于clk和led这两个信号的。继续debug，我们发现还有几个warning。</p>
-<p>massage(warning):
-&gt;[Constraints 18-5210] <strong>No constraints selected for write.</strong> Resolution: This message can indicate that there are no constraints for the design, or it can indicate that the used_in flags are set such that the constraints are ignored. This later case is used when running synth_design to not write synthesis constraints to the resulting checkpoint. Instead, project constraints are read when the synthesized design is opened.</p>
+<p>massage(warning):</p>
+<blockquote>
+<p>[Constraints 18-5210] <strong>No constraints selected for write.</strong> Resolution: This message can indicate that there are no constraints for the design, or it can indicate that the used_in flags are set such that the constraints are ignored. This later case is used when running synth_design to not write synthesis constraints to the resulting checkpoint. Instead, project constraints are read when the synthesized design is opened.</p>
+</blockquote>
 <p>原来这个错误可能和没有约束文件有关系。约束文件是干什么的呢？HDL只能描述FPGA内的电路的行为，对于其它则没有能力去描述。比如我希望某个信号是连接到外部IO口，比如我希望某一段电路的延迟小于某个数值。这时候就需要约束文件去描述了。</p>
 <p>重新打开Synthesized Design。点击I/O Pins，随后修改Package Pin与I/O std。这对于每个开发板都是不一样的，这需要查找原理图才能知道。注意如果是Zynq，时钟信号要连接到PL端的时钟。</p>
 <p><img src="fpga_intro/pic/vivado_synthesis_3.png" alt="" /></p>
@@ -313,7 +349,630 @@ set_property PACKAGE_PIN P15 [get_ports led]
 <p><img src="fpga_intro/pic/vivado_hardware_2.png" alt="" /></p>
 <p>然后选择Program Device，在弹出的窗口里选择Program。就可以下载了。</p>
 <p><img src="fpga_intro/pic/vivado_hardware_3.png" alt="" /></p>
-<p>这时候如果一切正常，你会发现LED一直发光。什！为什么不是闪烁？问题出在哪里？</p>
+<p>这时候如果一切正常，你会发现LED一直发光。</p>
+<p>什！为什么不是闪烁？问题出在哪里？</p>
+<h1><a class="header" href="#为什么灯不闪烁" id="为什么灯不闪烁">为什么灯不闪烁？</a></h1>
+<p>为什么仿真结果是正确的，但是下载到板上却是错误的？ 注意到verilog文件中有一个语句我们一直没有讲述它的具体含义。</p>
+<pre><code class="language-verilog">`timescale 1ns / 1ps
+</code></pre>
+<p>这句话代表着仿真时间单位与精度，这里代表我们以1ns的时间单位仿真，仿真精度为1ps。而我们在激励文件中是这样写的</p>
+<pre><code class="language-verilog">forever #(10) clk = ~clk;
+</code></pre>
+<p>这意味我们的时钟信号的半周期为10ns，频率也就是50MHz，这与我们开发板的时钟信号是一致的。这就意味着我们的LED每秒会闪烁25M次。我们希望这个灯能闪烁的慢一点，最好它周期是可控的，比如我希望这个灯的周期是1s。</p>
+<p>如果你了解过单片机，你会发现在单片机中类似的功能是由计数器提供的。这个计数器的原理顾名思义就是累计时钟信号的次数，当到达一定次数的时候也就意味着过了多长时间了。</p>
+<p>在FPGA中，我们也可以通过实现一个计数器来达到类似的目的。比如时钟信号是50MHz的，那我们要做三件事情</p>
+<ol>
+<li>累计时钟信号经过的周期数</li>
+<li>当累计25M次，清零</li>
+<li>当周期数=25MHz，也就是经过了0.5s时，改变LED的状态</li>
+</ol>
+<p>将代码修改为</p>
+<pre><code class="language-verilog">`timescale 1ns / 1ps
+
+module led(
+    input clk,
+    output logic led=0
+    );
+
+    logic [24:0] counter=0;
+    //累积周期数，并清零
+    always_ff@(posedge clk)begin
+        if(counter==25000000)
+            counter&lt;=0;
+        else
+            counter&lt;=counter+1;
+    end
+    
+    //判断是否改变LED
+    always_ff@(posedge clk)
+        if(counter==25000000)
+            led&lt;=~led;
+
+endmodule
+</code></pre>
+<p>接着我们进行仿真。将counter信号添加到波形中，进行仿真，结果如下。我们注意到在0.5s的时候计数器到了25M次，于是就清零了。同时led的状态也被改变了。而在1s的时候，counter的又记到了25M次，于是又清零了。而同时led的状态也再次被改变。</p>
+<p><img src="fpga_intro/./pic/vivado_sim_6.png" alt="" /></p>
+<p>我们下载到开发板，果然一切正常了。</p>
+<h1><a class="header" href="#优化" id="优化">优化</a></h1>
+<p>在编写完这样一个简单的程序，一个问题是，是否有优化的空间？和编写软件一样，实现一个功能有多种方法，我们需要对多个设计参数进行考量，找到一种最合理的方法。</p>
+<p>为了查看这个设计综合实现的结果，我们打开Project Summary，这里可以看到所有的结果。</p>
+<p>我们发现这个设计<strong>竟然</strong>使用了9个LUT和26个FF。虽然我们总共有17600个LUT和35200个FF，我们希望占用更少的LUT和FF，那要如何实现呢。
+<img src="fpga_intro/./pic/vivado_design.png" alt="" /></p>
+<h2><a class="header" href="#定位优化空间" id="定位优化空间">定位优化空间</a></h2>
+<p>我们注意到这个设计中最大的开销就是26位宽的counter和它的比较器，如果我们能想办法缩减counter的位数，就可以减少LUT和FF使用的数量。</p>
+<p>而如果要存储25M，我们必须要使用26位宽的寄存器。虽然\( 2^{25}\approx 35M \)，但我们无法再减小位宽了，因为\( 2^{24}\approx 16M &lt;25M \)。</p>
+<p>但是归根到底，我们需要25M还是因为时钟信号的周期为50MHz。如果我们有一个2的整数倍频率的周期信号，也就不需要这么麻烦了。事实上，FPGA中内置的锁相环可以解决这个问题，它可以将我们的时钟信号通过某种玄学变为4.687MHz~800MHz中的任意一个频率。由于锁相环是模拟电路实现的，直接在FPGA内就有，不需要占用FF和LUT，这样就可以减少FF和LUT的占用了。</p>
+<h2><a class="header" href="#生成clock-ip" id="生成clock-ip">生成Clock IP</a></h2>
+<p>点击IP Catalog，搜索clock，并找到Clock Wizard，双击。</p>
+<p><img src="fpga_intro/./pic/vivado_ip.png" alt="" /></p>
+<p>将输入的时钟频率改为你开发板的时钟频率，一般为50MHz。</p>
+<p><img src="fpga_intro/./pic/vivado_ip_1.png" alt="" /></p>
+<p>将输出的时钟频率改为8.388608MHz，这个数字正好是\( 2^{23} \)。</p>
+<p><img src="fpga_intro/./pic/vivado_ip_2.png" alt="" /></p>
+<p>点击OK，将Synthesis Options改为Global，并点击Generate。</p>
+<p><img src="fpga_intro/./pic/vivado_ip_3.png" alt="" /></p>
+<p>最后将led.sv改为</p>
+<pre><code class="language-verilog">module led(
+    input clk,
+    output led
+    );
+    logic clk_div,locked;
+
+    //连接clk_wiz_0ip与led模块
+    clk_wiz_0 c(
+        .clk_out1(clk_div),
+        .locked(locked),
+        .clk_in1(clk)
+    );
+
+    //计数器，由于计数器在8388608+1时溢出了，所以就变成0了
+    logic [22:0] cache=0;
+    always_ff@(posedge clk_div)
+        if(locked)
+            cache &lt;= cache + 1'b1;
+
+    assign led=cache[22];
+endmodule
+</code></pre>
+<h2><a class="header" href="#结果" id="结果">结果</a></h2>
+<p>可以看到我们只用了1个LUT与23个FF。这是因为加法运算由快速进位链完成了。而由于我们不需要比较器，所以大幅减少了LUT与FF的数量。但是我们发现时序出现了一些问题，这是由于23位的加法需要6个4位的快速进位链，这延长了最长路径，加大了延迟。所以尽管我们减少了LUT和FF的数量，却加大了最大延迟，降低了时钟的速度。</p>
+<p><img src="fpga_intro/./pic/vivado_ip_4.png" alt="" /></p>
+<h1><a class="header" href="#verilog语法基础" id="verilog语法基础">verilog语法基础</a></h1>
+<p>在这一节中，我们将学习verilog的一些基础知识，随后才开始真正进入verilog的学习。</p>
+<h2><a class="header" href="#注释" id="注释">注释</a></h2>
+<p>verilog的注释方式与C完全一致。</p>
+<pre><code class="language-verilog">//这是一个注释
+</code></pre>
+<pre><code class="language-verilog">/*这个注释从这里开始
+阿巴阿巴
+这个注释在这里结束*/
+</code></pre>
+<h2><a class="header" href="#数字常量的表示方式" id="数字常量的表示方式">数字常量的表示方式</a></h2>
+<p>数字常量在逻辑电路有着很重要的意义，比如一个计数器需要在每一个上升沿加一，此时的做法就是将一个拉高电平（代表1）的导线和计数器的寄存器用加法器连接在一起，并接一个触发器。</p>
+<p>在编程中，常量储存在常量池中，与变量的存储方式基本一致。而在数字电路中，常量往往是用拉高电平（代表1）或拉低电平（代表0）来实现的。</p>
+<p>在Verilog中，数字常量关注三个量，位宽，基数与数字本身。比如十进制下三位宽的2，可以如下表示</p>
+<pre><code class="language-verilog">3'b010
+3'o2
+3'd2
+3'h2
+</code></pre>
+<p>可以发现先是位宽，然后是基数，基数可选的有二进制（d），八进制（o），十进制（d），十六进制（h），最后是对应基数下的数字。值得注意的是这里的位宽都是指二进制下的位宽。</p>
+<pre><code>[size]'[base][number]
+</code></pre>
+<p>当然如果可以由编译器直接推断位宽，此时可以忽略位宽。这种做法极为不推荐，仅在少数情况中使用，比如给一个向量初始化为全0。</p>
+<pre><code class="language-verilog">reg [3:0] a; //一个四位宽的向量a
+assign a= 'b0; //这个等价为4`b0000
+</code></pre>
+<p>甚至当你不关注于基数时，可以直接忽略，写成纯数字，此时采用的是十进制。</p>
+<pre><code class="language-verilog">2 
+</code></pre>
+<h2><a class="header" href="#数据类型" id="数据类型">数据类型</a></h2>
+<p>由于Verilog原来是用来仿真而不是描述硬件的，出于仿真的需求，数据类型总体分为net和variable两大类。</p>
+<p>net类用于表示导线结构，它不存储状态，只能负责传递驱动级的输出。常见的net类数据包括wire、tri、wand和supply0等。variable类设计用于表示存储结构，它内部存储状态。reg是最典型的variable类数据。</p>
+<table><thead><tr><th>net</th><th>variable</th></tr></thead><tbody>
+<tr><td>wire, tri ...</td><td>reg, integer ...</td></tr>
+</tbody></table>
+<p>最常用的两种类型是wire与reg。reg和编程语言中的变量是类似的，可以理解为开辟了一块区域用于存储数据。wire则不同，它表示数据的传递方向。在一个模块中，当数据从多个input流入，如何从output流出的过程可以用wire来描述。 </p>
+<p>但要注意的是wire与reg有可能不直接对应底层的电路，比如使用了reg，最后生成的电路中却是组合逻辑电路。也就是不包含任何状态储存元件的电路。</p>
+<pre><code class="language-verilog">module top_module(
+	input reg a,b,sel, //这里声明了四个reg变量
+	output reg c);
+
+always@(*)
+	if (sel) c=a;
+	else c=b;
+
+endmodule
+</code></pre>
+<p>这个代码生成的电路是一个选择器，在之后的学习中，我们可以用纯粹组合逻辑的方式实现一个选择器。</p>
+<p><img src="verilog/./pic/reg.png" alt="" /> </p>
+<p>为了解决这个问题，SystemVerilog引入了logic的概念，编译器会自行推断是wire还是reg。在大部分情况下，使用logic可以替代wire与reg，除了多驱动电路。所以上述代码可以改成。</p>
+<pre><code class="language-verilog">module top_module(input logic a,b,sel,output logic c);
+always@(*)
+	if (sel) c=a;
+	else c=b;
+endmodule
+</code></pre>
+<h3><a class="header" href="#变量可以储存哪些值" id="变量可以储存哪些值">变量可以储存哪些值</a></h3>
+<table><thead><tr><th>值</th><th>含义</th></tr></thead><tbody>
+<tr><td>0</td><td>表示逻辑上的否</td></tr>
+<tr><td>1</td><td>表示逻辑上的是</td></tr>
+<tr><td>x</td><td>表示一个未知的量（通常是一种错误）</td></tr>
+<tr><td>z</td><td>表示高阻态（此时状态由其他驱动决定）</td></tr>
+</tbody></table>
+<p>通常来说，0与1是我们最常用的，如果你需要多驱动电路，会用到Z。但是，一旦出现X，非常可能是一种错误，比如未初始化的寄存器。</p>
+<h1><a class="header" href="#verilog-电路建模" id="verilog-电路建模">Verilog-电路建模</a></h1>
+<p>Verilog是一种类C的硬件描述语言（<strong>H</strong>ardware <strong>D</strong>escription <strong>L</strong>anguage）。描述电路的方式有很多，最直接的方式是通过描述电路的结构，也就是每个电子元件如何连接。这种方式看似低效，但借助现代编程语言的诸多特性（如面对对象，泛型，函数式编程），可以构建极为复杂的集成电路。这类语言的代表是Chisel。</p>
+<p>另一种描述方式则是通过对于输出与输入在空间与时间变化的描述来建模，不妨称之为行为建模。这种描述方式抛弃了对于底层的电路的控制权，将其交给综合器来处理。但这种方式隐藏了底层电路的实现，于是也就更简单易懂。Verilog主要采用这种方式建模电路。</p>
+<p><img src="verilog/./pic/full-adder.png" alt="" /> </p>
+<p>这是一个一位全加法器电路，一位表明它只能实现1+1或1+0或0+0的操作，并且它可以取一个进位，并且输出一个进位。通过本节与下节的学习，我们将能够实现这个电路的功能。尽管这个电路很简单，在学了下一节后，进行简单的抽象后我们可以将许多个基本加法单元连接在一起形成一个多位的加法器，并实现一个真正的并行进行运算加速。</p>
+<h2><a class="header" href="#int-main" id="int-main">int main()</a></h2>
+<p>每个C程序都有一个入口函数，约定俗成的称为main函数。而每一个Verilog程序也有一个入口，综合器从这里开始综合电路。一个入口可以是下面这个样子的。</p>
+<pre><code class="language-verilog">module top_module( 
+	input in, 
+	output out );//这里定义了输入输出
+
+	assign out = in;//这里描述了这个module的行为
+endmodule
+</code></pre>
+<p>在下一节中我们会继续介绍有关于module的事情。</p>
+<h2><a class="header" href="#assign关键字" id="assign关键字">assign关键字</a></h2>
+<p>assign被称为连续赋值关键字。所谓的连续赋值，是当等号右端的值发生改变时，左端的值也会重新计算。从电路的角度来看，这描述的是导线连接。</p>
+<p>让我们来看一个例子</p>
+<blockquote>
+<p>例 https://hdlbits.01xz.net/wiki/Wire<br />
+<img src="verilog/./pic/Wire.png" alt="" /></p>
+</blockquote>
+<p>题目要求将out和in用一根导线连接在一起，可以立刻想到用assign关键字来描述这个电路。 </p>
+<pre><code class="language-verilog">module top_module( input in, output out );
+	assign out = in; //当in改变时out也会改变
+endmodule
+</code></pre>
+<blockquote>
+<p>例 https://hdlbits.01xz.net/wiki/Zero</p>
+</blockquote>
+<h2><a class="header" href="#操作符" id="操作符">操作符</a></h2>
+<p>assign表达式等号右端的值可以为一个表达式，有了操作符，我们可以将多个变量用操作符连接在一起形成一个复杂的表达式，增加了我们可以描述的电路。</p>
+<p>与算数运算不同，数字电路中只有1和0，最基本的操作符只有非，与，或，异或。对于加减法，我们均可以通过以上操作符来实现，可以算作语法糖。之所以称“非”这些操作符为最基本的，是因为它们直接描述了最基本的门电路。</p>
+<h3><a class="header" href="#一输入门电路" id="一输入门电路">一输入门电路</a></h3>
+<p><img src="verilog/./pic/not.png" alt="" /> </p>
+<p>另一门电路是非门（NOT gate）或称反相器（inverter），相对应的逻辑运算为非（NOT）。非的逻辑关系非常简单，如果输入是0，输出为1。如果输入是1，则输出为0。它符号表示为一条小横线。在逻辑运算中，非运算的优先级最高。非门由于很常用，它的图标表示为输出上的一个小圆圈。</p>
+<p>在Verilog中用~表示非门。</p>
+<blockquote>
+<p>例 https://hdlbits.01xz.net/wiki/Notgate</p>
+</blockquote>
+<pre><code class="language-verilog">module top_module( input in, output out );
+	assign out = ~in;
+endmodule
+</code></pre>
+<h3><a class="header" href="#二输入门电路" id="二输入门电路">二输入门电路</a></h3>
+<p>对于二输入门电路，我们要记住的只有与门，或门与异或门与它们和非门的组合。二输入电路的输出比一输入多了一倍，为了方便记忆，我们可以记忆它们的特征而不是完整的真值表。 </p>
+<p><img src="verilog/./pic/and.png" alt="" /> </p>
+<p><img src="verilog/./pic/or.png" alt="" /> </p>
+<p>与门(AND gate)当且仅当两个输入均为1的时候输出1，或门(OR gate)当且仅当两个输入均为0的时候输出0。可以发现它们的真值表正好是互补的。在Verilog中，与门用&amp;，或门用|表示。与门的优先级比或门高，而非门的优先级比它们都高。</p>
+<blockquote>
+<p>练习 https://hdlbits.01xz.net/wiki/Andgate </p>
+</blockquote>
+<p><img src="verilog/./pic/xor.png" alt="" /> </p>
+<p>异或门（XOR gate）则不同，当两个输入不同时输出1，否则输出0。可以观察到的是，异或门在输入有奇数个1的时候输出1，有偶数个则输出0。因此有时也称异或门为奇偶校验器。异或门在Verilog中用^来表示，它的优先级介于与门和或门之间。其他门电路属于与门或门异或门与非门的组合，只要记住这三个门电路的输出，然后取反就可以了。</p>
+<blockquote>
+<p>练习<br />
+https://hdlbits.01xz.net/wiki/Xnorgate<br />
+https://hdlbits.01xz.net/wiki/Norgate<br />
+https://hdlbits.01xz.net/wiki/Wire_decl<br />
+https://hdlbits.01xz.net/wiki/7458</p>
+</blockquote>
+<h3><a class="header" href="#选择操作符" id="选择操作符">选择操作符</a></h3>
+<p>由于C是指令语言，它的指令都是顺序执行，有时需要根据指令做出一些选择，在C中，通过逻辑控制流程有if语句。同样的，在verilog中，？: 操作符可以实现类似的效果。你可以把1与0的电路中的处理过程理解为指令，通过一个门电路就是执行一个指令，？：实现的是从两个输入中根据第三个输入选择一个输出。</p>
+<p>你可能会好奇，这在电路中是如何实现的呢，是不是电路中有个小开关，根据1与0改变位置呢？这种实现已经超出了数字电路的范畴，它属于MEMS。很多时候实现一个功能不一定要直接实现，我们只要输出和输入匹配就行了。想一想选择器的输入输出是什么呢？当第三个输入为0时，输出应该和第一个输入一样，无论第二个输入为什么，而当第三个输入为1时，输出应该和第二输入一样，无论第一个输入为什么。</p>
+<p><img src="verilog/./pic/multiplexer.png" alt="" /> </p>
+<p>通过一些技巧（卡诺图），我们就可以归纳出选择器的布尔表达式是$Y = D_{0}\overline{S} + D_{1}S$在布尔表达式中，乘法表示与，加法表示或，而$\overline{S}$则表示非。你可以带入输入来验证这个表达式的正确性，通过这个表达式，我们就可以构建出门电路。</p>
+<p><img src="verilog/./pic/multiplexer_gates.png" alt="" /> </p>
+<p>你也可以通过FPGA实现这个，不过更多的时候我们还是通过：？来实现选择器。</p>
+<blockquote>
+<p>例 https://hdlbits.01xz.net/wiki/Mux2to1</p>
+</blockquote>
+<pre><code class="language-verilog">module top_module( 
+    input a, b, sel,
+    output out ); 
+    
+    assign out = sel ? b:a;
+
+endmodule
+</code></pre>
+<p>?的前面为作为选择的逻辑变量，如果这个变量为1，则选择:左边的变量，如果为0则选择:右边的变量。</p>
+<p>常用的操作符还有很多，我们将在后面讲解使用，这里给出表格方便查找。优先级由上至下递减。</p>
+<table><thead><tr><th>操作符</th><th>含义</th></tr></thead><tbody>
+<tr><td>~</td><td>非</td></tr>
+<tr><td>*,/,%</td><td>乘法，除法，取模</td></tr>
+<tr><td>+,-</td><td>加法，减法</td></tr>
+<tr><td>&lt;&lt;,&gt;&gt;</td><td>逻辑左移，右移</td></tr>
+<tr><td>&lt;&lt;&lt;,&gt;&gt;&gt;</td><td>算术左移，右移</td></tr>
+<tr><td>&lt;,&lt;=,&gt;,&gt;=</td><td>比较运算</td></tr>
+<tr><td>==,!=</td><td>相等性运算</td></tr>
+<tr><td>&amp;,~&amp;</td><td>与，与非</td></tr>
+<tr><td>^,~^</td><td>异或，同或</td></tr>
+<tr><td>|，~|</td><td>或，或非</td></tr>
+<tr><td>? :</td><td>三目操作符</td></tr>
+</tbody></table>
+<p>可以发现Verilog的操作符与C非常类似，值得注意的是在C中常用的逻辑操作符是~ &amp;&amp; ||，而Verilog中则是~ &amp; |，我们将在下一节中介绍它们的区别。</p>
+<h3><a class="header" href="#用assign实现全加器" id="用assign实现全加器">用assign实现全加器</a></h3>
+<blockquote>
+<p>例 https://hdlbits.01xz.net/wiki/Fadd</p>
+</blockquote>
+<p>为了实现全加器，我们需要知道全加器的布尔表达式。我们可以通过和上面一样的方法，先写出输入输出，再使用一些技巧归纳出布尔表达式，最后进行化简。然后在Verilog中实现就好了。</p>
+<table><thead><tr><th>cin</th><th>a</th><th>b</th><th>sum</th><th>cout</th></tr></thead><tbody>
+<tr><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+<tr><td>0</td><td>0</td><td>1</td><td>1</td><td>0</td></tr>
+<tr><td>0</td><td>1</td><td>0</td><td>1</td><td>0</td></tr>
+<tr><td>0</td><td>1</td><td>1</td><td>0</td><td>1</td></tr>
+<tr><td>1</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+<tr><td>1</td><td>0</td><td>1</td><td>0</td><td>1</td></tr>
+<tr><td>1</td><td>1</td><td>0</td><td>0</td><td>1</td></tr>
+<tr><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+</tbody></table>
+<p>这里直接给出布尔表达式为</p>
+<p>$$ sum = a \oplus b\oplus cin $$</p>
+<p>$$ cout = a<em>b + cin</em>(a+b) $$</p>
+<p>于是可以写出程序</p>
+<pre><code class="language-verilog">module top_module( 
+    input a, b, cin,
+    output cout, sum );
+    
+    assign sum=a^b^cin;
+    assign cout = a&amp;b | (cin &amp; (a^b));
+
+endmodule
+</code></pre>
+<h2><a class="header" href="#always" id="always">always</a></h2>
+<p>以下是always的语法</p>
+<pre><code class="language-verilog">always @ (event)
+	[statement]
+
+always @ (event) begin
+	[multiple statements]
+end
+</code></pre>
+<p>以always关键字开始，接下来是一个@()，括号内的内容被称为敏感列表。有多种模式</p>
+<pre><code class="language-verilog">always@(*)
+[statement]
+
+always@(a or b)
+[statement]
+</code></pre>
+<p>如果省略具体变量表示只要always内任意量发生变化，always内部的表达式都会被重新执行。而标注具体变量则只会在这些变量变化时重新执行内部的表达式。</p>
+<pre><code class="language-verilog">always@(posedge clk or b)
+[statement]
+</code></pre>
+<p>posedge关键字表明为上升沿敏感，negedge关键字表明为下降沿敏感。上升沿敏感表明会在信号从0到1变化的时候触发，下降沿反之。如果有多个信号，以or隔开。<strong>但是不能同时混用上升沿和下降沿。</strong></p>
+<pre><code class="language-verilog">always@(posedge clk or negedge b) //invaild!
+</code></pre>
+<p>接着是代码块，begin与end内的代码均为always被触发时执行的代码。如果只有一个代码，可以不用写。</p>
+<h2><a class="header" href="#使用always描述组合逻辑" id="使用always描述组合逻辑">使用always描述组合逻辑</a></h2>
+<p>当使用always描述组合逻辑时，我们使用的是第一种敏感列表，也就是</p>
+<pre><code class="language-verilog">always@(a or b)
+[statement]
+</code></pre>
+<p>这可以起到和assign关键字差不多的效果。但随着使用，发现这种方式并不是很好，因为如果你在括号内修改一个变量的名字，而没有加入到敏感列表中，会出现难以察觉的bug。于是verilog引入了下面一种方式</p>
+<pre><code class="language-verilog">always@(*)
+[statement]
+</code></pre>
+<p>这就和上面的效果是一样的。always用来描述组合逻辑有着诸多好处，然而，并不是所有always描述的电路都是组合逻辑。如果你错误的描述了一个其他类型的电路，编译器并不一定会报错，这会带来一些隐形的bug。SystemVerilog引入了一系列关键字来解决这个。</p>
+<pre><code class="language-verilog">always_comb
+[statement]
+</code></pre>
+<p>如果这其中生成不是组合逻辑电路，编译器会报错。这和C++中的override关键字起到了一样的效果。我们来用这个重写上面的全加器。</p>
+<pre><code class="language-verilog">module top_module(
+	input a, b, cin,
+    output cout, sum );
+
+always_comb begin
+	sum = a^b^cin;
+	cout = a&amp;b | (cin &amp; (a^b));
+end
+
+endmodule
+</code></pre>
+<h2><a class="header" href="#使用always描述时序逻辑" id="使用always描述时序逻辑">使用always描述时序逻辑</a></h2>
+<p>为了学习如何描述时序逻辑，我们需要知道什么是时序逻辑。时序逻辑与组合逻辑的最大区别在于，组合逻辑的输出只取决于输入，而时序逻辑的输出还取决于前一短时间内的输入。为什么要这样呢？因为很多功能都需要保存当前状态，比如一个计数器，需要知道已经数到几了。</p>
+<h3><a class="header" href="#锁存器与触发器" id="锁存器与触发器">锁存器与触发器</a></h3>
+<p>如果之前设计选择器的思路来设计这类电路是行不通的，因为布尔表达式的输出只与输入有关，与时间无关。所以不能通过求布尔表达式的方式来设计。所以，该如何设计呢？我们通过电路的稳态来实现，我们来看一个最简单的SR锁存器。</p>
+<h4><a class="header" href="#sr锁存器" id="sr锁存器">SR锁存器</a></h4>
+<p><img src="verilog/./pic/SR_latch.png" alt="" /></p>
+<p>可以发现的是其中两个或非门的输出都接入到对方的输入。那么怎么分析出这个电路的状态呢？此时我们只能通过假设然后验证。</p>
+<p>如果$R=1$且$S=0$，N1中至少有一个输入是1，由或门的特性知道，输出是1，再取非，就是0。那么N2的两个输入都是0，由或门的特性知道，输出是0，再取非，就是1。我们可以再验证，N1两端都是1，所以输出是0，符合我们之前的猜想，电路是稳定的。其他状态不难验证，我们可以得到如下真值表。</p>
+<p><img src="verilog/./pic/SR_latch_truth_table.png" alt="" /></p>
+<p>可以发现当S，R都为0，SR锁存器会保存前一刻的状态，而当S为1，R为0时，Q被设置为1，当S为0，R为1时，Q被设置为0。我们舍弃S，R均为1的状态，不给它任何明确意义。SR锁存器既可以保存状态也可以设置状态。</p>
+<p><img src="verilog/./pic/SR_latch_symbol.png" alt="" /></p>
+<h4><a class="header" href="#d锁存器" id="d锁存器">D锁存器</a></h4>
+<p>SR锁存器的设计上有一些缺陷，输入既需要控制何时改变它的内容，何时保留它的内容，又要控制它的内容是什么，这无疑增加了电路设计的难度。如果我们的锁存器可以接受两个信号，一个控制可不可以改变它的内容，一个控制它的内容，这无疑简化了其他电路的设计难度。于是有了D锁存器。</p>
+<p><img src="verilog/./pic/D_latch.png" alt="" /></p>
+<p>可以发现D锁存器可以通过clk控制能不能改变它的内容，当clk为0时，保留内容，而当clk为1时，内部的状态由D输入决定。</p>
+<h4><a class="header" href="#d触发器" id="d触发器">D触发器</a></h4>
+<p>尽管数字电路相对于模拟电路舍弃了许多物理细节，帮助我们抽象电路，但是不可忽略的一点就是信号的传输速度。传输速度对于门电路最大的影响就是会产生意外的输出，比如电路的稳定状态应该输出1，然而从改变电路输入到电路输出变为1之间有一段时间，这段时间中输出有可能是1，有可能是0，不受控制。这时候我们需要一个电路，可以等待一段时间再输出结果不是可以解决这个问题了，于是我们引入了D触发器。</p>
+<p><img src="verilog/./pic/Dff.png" alt="" /></p>
+<p>D触发器捕获clk的边沿，即从0变为1或1变为0的过程。只要两个边沿之间的时间大于其中电路的稳定时间，那么这个电路就可以保证是正常工作的。这无疑是简化了电路设计的难度。</p>
+<pre><code class="language-verilog">//锁存器
+reg q,d;
+always @(*) begin
+	if (clk) q&lt;=d;
+end
+
+/* 
+always_latch begin
+	if (clk) q&lt;=d;
+end 
+*/等价
+</code></pre>
+<p><img src="verilog/./pic/always_d_latch.png" alt="" /></p>
+<pre><code class="language-verilog">//触发器
+reg q,d;
+always @(posedge clk) begin
+    q &lt;= d;
+end
+
+/*
+always_ff@ (posedge clk) begin
+    q &lt;= d;
+end
+*/等价
+
+</code></pre>
+<p><img src="verilog/./pic/always1.png" alt="" /></p>
+<h3><a class="header" href="#阻塞赋值与非阻塞赋值" id="阻塞赋值与非阻塞赋值">阻塞赋值与非阻塞赋值</a></h3>
+<p>&lt;=是我们从未见过的赋值符号。在always内我们可以使用两种赋值符号，一个是=，称为阻塞赋值，一个是&lt;=，称为非阻塞赋值。它们有什么区别呢？阻塞赋值，和编程一样，只有当上一条赋值语句执行完后才会执行下一个。而非阻塞赋值则不然，和assign关键字类似，是一起赋值的。我们来看一个例子。</p>
+<pre><code class="language-verilog">always @(posedge clk)
+begin
+    b=a;
+    c=b;
+end
+</code></pre>
+<pre><code class="language-verilog">always @( posedge clk )
+begin
+    b&lt;=a;
+    c&lt;=b;
+end
+</code></pre>
+<p>当第一个上升沿来临时，对于第一段代码，首先b获得了a的值，然后c获得了b的值，完成了值从a到c的传递。对于第二段代码，首先同样b获得了a的值，那么c貌似获得了b的值也获得了a的值，但由于它们是并行执行的，所以c获得的是b在未改变之前的值。直到下一个上升沿来临时，c才能活得b在这个上升沿的值，也就是a的值。</p>
+<p>第一段代码只需要一个上升沿就完成了值的传递，而第二段代码需要两个时钟周期。它们综合成的电路也是不一样的。</p>
+<p><img src="verilog/./pic/always2.png" alt="" /> </p>
+<p><img src="verilog/./pic/always3.png" alt="" /> </p>
+<p>可见&lt;=用于描述一时刻前后两变量的关系，而=用于描述同一时刻两变量的关系。所以&lt;=更多的用于描述时序电路，而=用于描述组合逻辑电路。</p>
+<p>值得一提的时，在always关键字内所有处于等号左边的值都必须声明为Reg类型，而其它不属于这个范畴的都声明为Wire，没有例外。</p>
+<h1><a class="header" href="#verilog层级构建" id="verilog层级构建">verilog层级构建</a></h1>
+<p>在学习了上节内容，我们终于有了能力编写简单的一位全加器。可是，现实世界中涉及的问题往往并不只有一位，在c++中int的长度是32位。如果没有简单的描述方法，仅仅是实现一个常用的int加法，我们就需要重复编写32个加法器，而这需要声明32*5个不同名称的变量，即使它们的区别仅仅是名字不同。</p>
+<p>尽管Verilog的语法并不优美，但它仍然提供了这种情况下简化代码的方式。和C一样，Verilog引入了数组和模块的概念来解决这个问题。向量提供了表示多位输入的方式，而模块提供了多层次的抽象。</p>
+<p>这一节中我们将介绍Vector与Module这两个东西解决上述问题。</p>
+<h2><a class="header" href="#vector" id="vector">vector</a></h2>
+<p>Verilog中定义向量的方式与C有很大的区别，以下面为例 </p>
+<pre><code class="language-verilog">wire[9:0] a;
+</code></pre>
+<p>这是一个10位，类型为wire的数组。在Verilog中，我们统一采用大数在前的索引方式，我们称之为大端索引，与之相对的还有小端索引。之所以需要标注上下限是因为Verilog允许如下的写法</p>
+<pre><code class="language-verilog">wire[4:1] a;
+input wire[1:-2] b;
+</code></pre>
+<p>在之后我们会介绍这种写法的好处。</p>
+<h3><a class="header" href="#索引方式" id="索引方式">索引方式</a></h3>
+<p>与C相同的是，Verilog支持单个数字索引。</p>
+<pre><code class="language-verilog">assign a[0] = ~a[1];
+</code></pre>
+<p><img src="verilog/./pic/index.png" alt="" /></p>
+<p>当然，更常用的方式是对数组整体的索引。</p>
+<pre><code class="language-verilog">assign b[1:-2] = ~a[4:1];
+</code></pre>
+<p><img src="verilog/./pic/index2.png" alt="" /></p>
+<p>如果数组的长度相同，你可以直接忽略索引，当作一个整体操作。</p>
+<pre><code class="language-verilog">assign b=~a;
+</code></pre>
+<p>数组的内容当然不止这些，在掌握了基础内容，我们可以练习一下了。</p>
+<blockquote>
+<p>例 https://hdlbits.01xz.net/wiki/Vector0<br />
+<img src="verilog/./pic/Vector0.png" alt="" /></p>
+</blockquote>
+<p>题目要求将3位的输入分成相同的两部分，一部分全部给outv，而另一部分分给不同的三个输出o2，o1，o0。图中线上的数字标记了这个线的位宽，而带括号的指明了数组的位数。</p>
+<pre><code class="language-verilog">module top_module ( 
+    input wire [2:0] vec,
+    output wire [2:0] outv,
+    output wire o2,
+    output wire o1,
+    output wire o0  ); // Module body starts after module declaration
+    
+    assign outv = vec;
+    assign o2 = vec[2];
+    assign o1 = vec[1];
+    assign o0 = vec[0];
+
+endmodule
+</code></pre>
+<p>对于数组来说，一个可能的问题是，如果你将不同长度的数组相互连接在一起，会发生什么呢？按照常理来说，这是不被允许的，因为硬件要求容错率远低于软件，相应的编程也因更加严格。然而Verilog中会自动的截尾或转换。在我看来这并非是一个语法糖，而是一个设计上的失误，所以我们应尽量避免这种情况的发生。</p>
+<blockquote>
+<p>练习<br />
+https://hdlbits.01xz.net/wiki/Vector1<br />
+https://hdlbits.01xz.net/wiki/Vector2<br />
+https://hdlbits.01xz.net/wiki/Vectorgates<br />
+https://hdlbits.01xz.net/wiki/Gates4</p>
+</blockquote>
+<h3><a class="header" href="#数组的连接" id="数组的连接">数组的连接</a></h3>
+<p>数组的索引是选择数组的一部分，而有时候我们希望将多个数组合并成为一个更宽的数组。一个可能的操作方式如下</p>
+<pre><code class="language-verilog">wire[7:0] a;
+wire[3:0] b;
+wire[3:0] c;
+
+assign a[7:4] = b[3:0];
+assign a[3:0] = c[3:0];
+</code></pre>
+<blockquote>
+<p><img src="verilog/./pic/con1.png" alt="" /></p>
+</blockquote>
+<p>这并不方便，因为我们需要人为的将每个数组对齐。Verilog提供了连接操作符，语法如下</p>
+<pre><code class="language-verilog">a = {b,c};
+</code></pre>
+<p>可以发现左边是高位，右边是低位。所以b在左边，c在右边。这与之前我们声明数组的顺序是一致的。</p>
+<blockquote>
+<p>练习<br />
+https://hdlbits.01xz.net/wiki/Vector3<br />
+https://hdlbits.01xz.net/wiki/Vectorr</p>
+</blockquote>
+<p>有时候我们还学要将某一数组复制多份，比如为了保留数字的符号，在扩充时需要根据首位来判断填充0还是1。语法如下</p>
+<pre><code class="language-verilog">a = {2{b}};
+</code></pre>
+<blockquote>
+<p>例 https://hdlbits.01xz.net/wiki/Vector4</p>
+</blockquote>
+<p>题目要求根据在扩充数组时，复制第一位。</p>
+<pre><code class="language-verilog">module top_module (
+    input [7:0] in,
+    output [31:0] out );//
+
+    // assign out = { replicate-sign-bit , the-input };
+    assign out = {{24{in[7]}},in};
+endmodule
+</code></pre>
+<blockquote>
+<p><img src="verilog/./pic/Vector01.png" alt="" /></p>
+</blockquote>
+<blockquote>
+<p>练习<br />
+https://hdlbits.01xz.net/wiki/Vector5 </p>
+</blockquote>
+<h3><a class="header" href="#逻辑操作符与位操作符" id="逻辑操作符与位操作符">逻辑操作符与位操作符</a></h3>
+<p>对于一位的两个变量，逻辑操作符与位操作符没有区别。对于多位的变量，位操作符对各个位进行操作，而逻辑操作符对整体操作（true = 非全0， false = 全0）。</p>
+<blockquote>
+<p>例 https://hdlbits.01xz.net/wiki/Vectorgates</p>
+</blockquote>
+<pre><code class="language-verilog">module top_module( 
+    input [2:0] a,
+    input [2:0] b,
+    output [2:0] out_or_bitwise,
+    output out_or_logical,
+    output [5:0] out_not
+);
+    assign out_or_bitwise = a |b;
+    assign out_not[2:0] = ~a;
+    assign out_not[5:3] = ~b;
+    assign out_or_logical = a || b;
+    
+endmodule
+</code></pre>
+<h2><a class="header" href="#module" id="module">module</a></h2>
+<p>模块的声明如下</p>
+<pre><code class="language-verilog">module &lt;name&gt; ([port_list]);
+	// Contents of the module
+endmodule
+
+// module可以不需要端口
+module name;
+	// Contents of the module
+endmodule
+</code></pre>
+<p>以module关键字开始，接着是模块的名称，随后是括号，括号内写明输入输出，以逗号间隔开。如果没有写明类型，默认为wire。</p>
+<pre><code class="language-verilog">module a(input clk) //等价为input wire clk
+
+endmodule
+</code></pre>
+<p>对于输入输出一共有三种类型</p>
+<table><thead><tr><th>类型</th><th>描述</th></tr></thead><tbody>
+<tr><td>input</td><td>只能出现在等号右端</td></tr>
+<tr><td>output</td><td>只能出现在等号左端</td></tr>
+<tr><td>inout</td><td>都可以</td></tr>
+</tbody></table>
+<p>一个完整的声明如下</p>
+<pre><code class="language-verilog">input [net_type] [range] list_of_names; 
+</code></pre>
+<p>如</p>
+<pre><code class="language-verilog">input logic [3:0] a,b,c,
+</code></pre>
+<h2><a class="header" href="#module-instantiations" id="module-instantiations">module Instantiations</a></h2>
+<p>module的使用方式和类实例化的方式很类似</p>
+<pre><code class="language-verilog">wire a,b,c;
+mod_a ins(.in1(a),.in2(b),.out(c));
+</code></pre>
+<p>值得注意的是这里我们直接指明了输入输出名称，而不是使用顺序。尽管Verilog允许使用顺序的方式</p>
+<pre><code class="language-verilog">wire a,b,c;
+mod_a ins(a,b,c);
+</code></pre>
+<p>但是正如上面提及的，硬件的容错率很低，在大项目中如果某一个地方更改了声明的顺序，可能会导致某处连接错误，这种bug通常难以找到。所以直接指明输入输出名称是一个使用模块的好习惯。</p>
+<blockquote>
+<p>例 https://hdlbits.01xz.net/wiki/Module<br />
+<img src="verilog/./pic/Module.png" alt="" /></p>
+</blockquote>
+<pre><code class="language-verilog">module top_module ( input a, input b, output out );
+    mod_a ins(.out(out),.in1(a),.in2(b));
+endmodule
+</code></pre>
+<blockquote>
+<p>练习<br />
+https://hdlbits.01xz.net/wiki/Module_pos<br />
+https://hdlbits.01xz.net/wiki/Module_name<br />
+https://hdlbits.01xz.net/wiki/Module_shift<br />
+https://hdlbits.01xz.net/wiki/Module_fadd<br />
+https://hdlbits.01xz.net/wiki/Module_cseladd<br />
+https://hdlbits.01xz.net/wiki/Module_addsub</p>
+</blockquote>
+<h3><a class="header" href="#例" id="例">例</a></h3>
+<blockquote>
+<p>例1 将两个16位的加法器连接在一起变成32位的<br />
+https://hdlbits.01xz.net/wiki/Module_add</p>
+</blockquote>
+<p><img src="verilog/./pic/Module_add.png" alt="" /></p>
+<pre><code class="language-verilog">module top_module(
+    input [31:0] a,
+    input [31:0] b,
+    output [31:0] sum
+);
+    wire cout;
+    add16 ins1(a[15:0],b[15:0],0,sum[15:0],cout);
+    add16 ins2(a[31:16],b[31:16],cout,sum[31:16],0);
+
+endmodule
+</code></pre>
+<blockquote>
+<p>例2 通过电路面积换取运算速度 
+https://hdlbits.01xz.net/wiki/Module_cseladd</p>
+</blockquote>
+<p><img src="verilog/./pic/Module_cseladd.png" alt="" /></p>
+<pre><code class="language-verilog">module top_module(
+    input [31:0] a,
+    input [31:0] b,
+    output [31:0] sum
+);
+    wire [15:0] sum1,sum2;
+    
+    add16 ins1(a[31:16],b[31:16],0,sum1,0);
+    add16 ins2(a[31:16],b[31:16],1,sum2,0);
+    
+    wire cout;
+    
+    add16 ins3(a[15:0],b[15:0],0,sum[15:0],cout);
+    
+    always_comb begin
+        if (cout == 1) begin
+            sum[31:16] = sum2;
+        end else begin
+            sum[31:16] = sum1;
+        end
+    end
+    
+endmodule
+</code></pre>
+<p>我们都知道电流的传播速度是有限的，因此数字电路的一大问题就是在于一个电路越长时，使这个达到稳定状态即完成它的功能所需的时间就越长。因此，缩短最长路径是优化电路的一个方式。</p>
+<p>这里虽然使用了三个16位加法器来计算32位加法，但相对于例1，我们的最长路径缩短了差不多一半，于是也就加快了运算速度。从程序的角度来看，我们的程序本来是这个样子的。</p>
+<pre><code>//thread1
+add16()
+add16()
+</code></pre>
+<p>现在他变成这个样子了</p>
+<pre><code>//thread1
+add16()
+</code></pre>
+<pre><code>//thread2
+add16()
+</code></pre>
+<pre><code>//thread3
+add16()
+</code></pre>
+<p>即使我们需要舍弃一个的运算结果，每个线程的运算所需时间都是上一个程序的一般，而当他们同时运行，总共所需时间就减少了一半。</p>
+<p>当然这是最简单的优化方式，现在有着诸如行波进位加法器，先行进位加法器，前缀加法器等等等。这里就不做过多介绍了。</p>
 
                     </main>
 
@@ -367,7 +1026,9 @@ set_property PACKAGE_PIN P15 [get_ports led]
         
         <script type="text/javascript">
         window.addEventListener('load', function() {
-            window.setTimeout(window.print, 100);
+            MathJax.Hub.Register.StartupHook('End', function() {
+                window.setTimeout(window.print, 100);
+            });
         });
         </script>
         

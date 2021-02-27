@@ -98,7 +98,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../index.html"><strong aria-hidden="true">1.</strong> 前言</a></li><li class="chapter-item expanded "><a href="../fpga_intro/fpga_intro.html"><strong aria-hidden="true">2.</strong> Intro to 嵌入式点灯工程师</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../fpga_intro/hdl.html" class="active"><strong aria-hidden="true">2.1.</strong> 编写HDL</a></li><li class="chapter-item expanded "><a href="../fpga_intro/ip.html"><strong aria-hidden="true">2.2.</strong> “优化”</a></li></ol></li><li class="chapter-item expanded "><a href="../verilog/basic_syntax.html"><strong aria-hidden="true">3.</strong> verilog语法基础</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../verilog/circuit_modelling.html"><strong aria-hidden="true">3.1.</strong> 电路建模</a></li><li class="chapter-item expanded "><a href="../verilog/hierarchy_construction.html"><strong aria-hidden="true">3.2.</strong> 层次构建</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../index.html"><strong aria-hidden="true">1.</strong> 前言</a></li><li class="chapter-item expanded "><a href="../fpga_intro/fpga_intro.html"><strong aria-hidden="true">2.</strong> Intro to 嵌入式点灯工程师</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../fpga_intro/hdl.html" class="active"><strong aria-hidden="true">2.1.</strong> 编写HDL</a></li><li class="chapter-item expanded "><a href="../fpga_intro/ip.html"><strong aria-hidden="true">2.2.</strong> “优化”</a></li></ol></li><li class="chapter-item expanded "><a href="../verilog/basic_syntax.html"><strong aria-hidden="true">3.</strong> verilog语法基础</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../verilog/circuit_modelling.html"><strong aria-hidden="true">3.1.</strong> 电路建模</a></li><li class="chapter-item expanded "><a href="../verilog/hierarchy_construction.html"><strong aria-hidden="true">3.2.</strong> 层次构建</a></li></ol></li><li class="chapter-item expanded "><a href="../system_verilog/index.html"><strong aria-hidden="true">4.</strong> 可综合的SystemVerilog</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../system_verilog/data_types.html"><strong aria-hidden="true">4.1.</strong> 数据类型</a></li></ol></li><li class="chapter-item expanded "><a href="../how_it's_made.html"><strong aria-hidden="true">5.</strong> FPGA内部组成</a></li><li class="chapter-item expanded "><a href="../EBAZ4205.html"><strong aria-hidden="true">6.</strong> 矿板的自我修养——EBAZ4205</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -170,7 +170,7 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#编写hdl" id="编写hdl">编写HDL</a></h1>
+                        <h1 id="编写hdl"><a class="header" href="#编写hdl">编写HDL</a></h1>
 <p>点击Project Manager下的Add Source，</p>
 <p><img src="pic/vivado_source.png" alt="" /></p>
 <p>点击next，选择Create File。在弹出的窗口中选择SystemVerilog，名称任意。</p>
@@ -199,7 +199,7 @@ endmodule
 <p>这段代码描述了什么样的电路呢？我们可以通过RTL Analysis来查看结果。点击Open Elaborated Design。右侧就是我们的RTL设计。RTL_REG会在clk的上升沿，将D的数据输入到Q。这个由
 <code>always_ff@(posedge clk)</code>描述。而RTL_INV负责将Q的数据取反然后输入到D，取反意味着1会变成0，vice versa。这意味着在每一个时钟上升沿，led的值都会变化，产生LED闪烁的效果。</p>
 <p><img src="pic/vivado_rtl.png" alt="" /></p>
-<h1><a class="header" href="#仿真" id="仿真">仿真</a></h1>
+<h1 id="仿真"><a class="header" href="#仿真">仿真</a></h1>
 <p>在编写完HDL后，第一件应该做的就是仿真了。在debug程序时，我们都要给程序一个输入，然后观察输出是什么，以此来寻找程序的bug。在仿真数字电路，同理我们需要激励（输入），来观察响应（输出）是否正确。而这一切都体现在波形图上。</p>
 <p>现在我们来创建一个激励，点击Add Sources，选择Add or Create Simulation Resources。点击Next。</p>
 <p><img src="pic/vivado_sim.png" alt="" /></p>
@@ -238,7 +238,7 @@ endmodule
 </code></pre>
 <p>保存后，点击菜单中的Relaunch Simulation。观察到led的波形终于会在0与1之间跳动了，我们程序的行为终于正确了。</p>
 <p><img src="pic/vivado_sim_5.png" alt="" /></p>
-<h1><a class="header" href="#综合" id="综合">综合</a></h1>
+<h1 id="综合"><a class="header" href="#综合">综合</a></h1>
 <p>点击左侧的Run Synthesis，在弹出的窗口点击Ok。等待综合完成</p>
 <p><img src="pic/vivado_synthesis.png" alt="" /></p>
 <p>选择Open Synthesized Design，点击OK。或者在左边点击Open Synthesized Design。</p>
@@ -246,12 +246,12 @@ endmodule
 <p>我们此时就可以看到电路被综合以后的结果。BUF是为了隔离其他电路对这部分电路的影响，包括提高驱动能力，降低延迟等。FDRE表明这首先是一个D触发器，接着它是同步使能，同步复位。FDRE的D与Q代表数据的输入与输出。C表示时钟信号。这与我们在上一个电路图中看到的是一致的。多出来的CE代表时钟使能，R表示复位。它们永远保持在一个状态，与我们的电路无关，所以不会出现在上一幅图中。但是如果要实现出来确实必要的。上一幅图中的反相器被一个叫LUT的替换了，LUT是查找表的意思，是FPGA实现组合逻辑的一种方式。</p>
 <p><img src="pic/vivado_synthesis_2.png" alt="" /></p>
 <p>可见综合后的电路是可以被真正实现的，因此包含了更多的细节。这些细节是与我们电路功能不太相关的，因此可以在设计的时候被忽略的。</p>
-<h1><a class="header" href="#实现" id="实现">实现</a></h1>
+<h1 id="实现"><a class="header" href="#实现">实现</a></h1>
 <p>点击左侧的Run Implementation，在弹出的窗口点击Ok。等待实现完成</p>
 <p><img src="pic/vivado_impl.png" alt="" /></p>
 <p>和之前一样打开Implemented Design，就可以看到这个程序真正在FPGA上实现的结果了。选择Leaf Cell下面的LUT，点击工具栏里的Routing Resources，然后放大到那个位置。这就是我们整个程序主体的实现结果。可以看见图中选中的即为synthesized design中的LUT，而另一个蓝色方块为FDRE。绿色代表它们之间的连线。</p>
 <p><img src="pic/vivado_impl_2.png" alt="" /></p>
-<h1><a class="header" href="#生成bitstream与下载" id="生成bitstream与下载">生成bitstream与下载</a></h1>
+<h1 id="生成bitstream与下载"><a class="header" href="#生成bitstream与下载">生成bitstream与下载</a></h1>
 <p>这时候我们就已经到了整个的设计流程的最后一步，下载程序。和之前一样点击Generate Bitstream，然后点击Ok。我们马上就见到了报错。生成失败了！这是为什么呢？</p>
 <p><img src="pic/vivado_gen.png" alt="" /></p>
 <p>查看Log与Message，我们发现了几条重要线索。</p>

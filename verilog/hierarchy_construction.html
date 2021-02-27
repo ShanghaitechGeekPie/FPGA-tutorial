@@ -98,7 +98,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../index.html"><strong aria-hidden="true">1.</strong> 前言</a></li><li class="chapter-item expanded "><a href="../fpga_intro/fpga_intro.html"><strong aria-hidden="true">2.</strong> Intro to 嵌入式点灯工程师</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../fpga_intro/hdl.html"><strong aria-hidden="true">2.1.</strong> 编写HDL</a></li><li class="chapter-item expanded "><a href="../fpga_intro/ip.html"><strong aria-hidden="true">2.2.</strong> “优化”</a></li></ol></li><li class="chapter-item expanded "><a href="../verilog/basic_syntax.html"><strong aria-hidden="true">3.</strong> verilog语法基础</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../verilog/circuit_modelling.html"><strong aria-hidden="true">3.1.</strong> 电路建模</a></li><li class="chapter-item expanded "><a href="../verilog/hierarchy_construction.html" class="active"><strong aria-hidden="true">3.2.</strong> 层次构建</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../index.html"><strong aria-hidden="true">1.</strong> 前言</a></li><li class="chapter-item expanded "><a href="../fpga_intro/fpga_intro.html"><strong aria-hidden="true">2.</strong> Intro to 嵌入式点灯工程师</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../fpga_intro/hdl.html"><strong aria-hidden="true">2.1.</strong> 编写HDL</a></li><li class="chapter-item expanded "><a href="../fpga_intro/ip.html"><strong aria-hidden="true">2.2.</strong> “优化”</a></li></ol></li><li class="chapter-item expanded "><a href="../verilog/basic_syntax.html"><strong aria-hidden="true">3.</strong> verilog语法基础</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../verilog/circuit_modelling.html"><strong aria-hidden="true">3.1.</strong> 电路建模</a></li><li class="chapter-item expanded "><a href="../verilog/hierarchy_construction.html" class="active"><strong aria-hidden="true">3.2.</strong> 层次构建</a></li></ol></li><li class="chapter-item expanded "><a href="../system_verilog/index.html"><strong aria-hidden="true">4.</strong> 可综合的SystemVerilog</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../system_verilog/data_types.html"><strong aria-hidden="true">4.1.</strong> 数据类型</a></li></ol></li><li class="chapter-item expanded "><a href="../how_it's_made.html"><strong aria-hidden="true">5.</strong> FPGA内部组成</a></li><li class="chapter-item expanded "><a href="../EBAZ4205.html"><strong aria-hidden="true">6.</strong> 矿板的自我修养——EBAZ4205</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -170,11 +170,11 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#verilog层级构建" id="verilog层级构建">verilog层级构建</a></h1>
+                        <h1 id="verilog层级构建"><a class="header" href="#verilog层级构建">verilog层级构建</a></h1>
 <p>在学习了上节内容，我们终于有了能力编写简单的一位全加器。可是，现实世界中涉及的问题往往并不只有一位，在c++中int的长度是32位。如果没有简单的描述方法，仅仅是实现一个常用的int加法，我们就需要重复编写32个加法器，而这需要声明32*5个不同名称的变量，即使它们的区别仅仅是名字不同。</p>
 <p>尽管Verilog的语法并不优美，但它仍然提供了这种情况下简化代码的方式。和C一样，Verilog引入了数组和模块的概念来解决这个问题。向量提供了表示多位输入的方式，而模块提供了多层次的抽象。</p>
 <p>这一节中我们将介绍Vector与Module这两个东西解决上述问题。</p>
-<h2><a class="header" href="#vector" id="vector">vector</a></h2>
+<h2 id="vector"><a class="header" href="#vector">vector</a></h2>
 <p>Verilog中定义向量的方式与C有很大的区别，以下面为例 </p>
 <pre><code class="language-verilog">wire[9:0] a;
 </code></pre>
@@ -183,7 +183,7 @@
 input wire[1:-2] b;
 </code></pre>
 <p>在之后我们会介绍这种写法的好处。</p>
-<h3><a class="header" href="#索引方式" id="索引方式">索引方式</a></h3>
+<h3 id="索引方式"><a class="header" href="#索引方式">索引方式</a></h3>
 <p>与C相同的是，Verilog支持单个数字索引。</p>
 <pre><code class="language-verilog">assign a[0] = ~a[1];
 </code></pre>
@@ -223,7 +223,7 @@ https://hdlbits.01xz.net/wiki/Vector2<br />
 https://hdlbits.01xz.net/wiki/Vectorgates<br />
 https://hdlbits.01xz.net/wiki/Gates4</p>
 </blockquote>
-<h3><a class="header" href="#数组的连接" id="数组的连接">数组的连接</a></h3>
+<h3 id="数组的连接"><a class="header" href="#数组的连接">数组的连接</a></h3>
 <p>数组的索引是选择数组的一部分，而有时候我们希望将多个数组合并成为一个更宽的数组。一个可能的操作方式如下</p>
 <pre><code class="language-verilog">wire[7:0] a;
 wire[3:0] b;
@@ -266,7 +266,7 @@ endmodule
 <p>练习<br />
 https://hdlbits.01xz.net/wiki/Vector5 </p>
 </blockquote>
-<h3><a class="header" href="#逻辑操作符与位操作符" id="逻辑操作符与位操作符">逻辑操作符与位操作符</a></h3>
+<h3 id="逻辑操作符与位操作符"><a class="header" href="#逻辑操作符与位操作符">逻辑操作符与位操作符</a></h3>
 <p>对于一位的两个变量，逻辑操作符与位操作符没有区别。对于多位的变量，位操作符对各个位进行操作，而逻辑操作符对整体操作（true = 非全0， false = 全0）。</p>
 <blockquote>
 <p>例 https://hdlbits.01xz.net/wiki/Vectorgates</p>
@@ -285,7 +285,7 @@ https://hdlbits.01xz.net/wiki/Vector5 </p>
     
 endmodule
 </code></pre>
-<h2><a class="header" href="#module" id="module">module</a></h2>
+<h2 id="module"><a class="header" href="#module">module</a></h2>
 <p>模块的声明如下</p>
 <pre><code class="language-verilog">module &lt;name&gt; ([port_list]);
 	// Contents of the module
@@ -313,7 +313,7 @@ endmodule
 <p>如</p>
 <pre><code class="language-verilog">input logic [3:0] a,b,c,
 </code></pre>
-<h2><a class="header" href="#module-instantiations" id="module-instantiations">module Instantiations</a></h2>
+<h2 id="module-instantiations"><a class="header" href="#module-instantiations">module Instantiations</a></h2>
 <p>module的使用方式和类实例化的方式很类似</p>
 <pre><code class="language-verilog">wire a,b,c;
 mod_a ins(.in1(a),.in2(b),.out(c));
@@ -340,7 +340,7 @@ https://hdlbits.01xz.net/wiki/Module_fadd<br />
 https://hdlbits.01xz.net/wiki/Module_cseladd<br />
 https://hdlbits.01xz.net/wiki/Module_addsub</p>
 </blockquote>
-<h3><a class="header" href="#例" id="例">例</a></h3>
+<h3 id="例"><a class="header" href="#例">例</a></h3>
 <blockquote>
 <p>例1 将两个16位的加法器连接在一起变成32位的<br />
 https://hdlbits.01xz.net/wiki/Module_add</p>
@@ -416,6 +416,10 @@ add16()
                         
 
                         
+                            <a rel="next" href="../system_verilog/index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
 
                         <div style="clear: both"></div>
                     </nav>
@@ -429,6 +433,10 @@ add16()
                     </a>
                 
 
+                
+                    <a rel="next" href="../system_verilog/index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
                 
             </nav>
 

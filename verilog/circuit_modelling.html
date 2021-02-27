@@ -98,7 +98,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../index.html"><strong aria-hidden="true">1.</strong> 前言</a></li><li class="chapter-item expanded "><a href="../fpga_intro/fpga_intro.html"><strong aria-hidden="true">2.</strong> Intro to 嵌入式点灯工程师</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../fpga_intro/hdl.html"><strong aria-hidden="true">2.1.</strong> 编写HDL</a></li><li class="chapter-item expanded "><a href="../fpga_intro/ip.html"><strong aria-hidden="true">2.2.</strong> “优化”</a></li></ol></li><li class="chapter-item expanded "><a href="../verilog/basic_syntax.html"><strong aria-hidden="true">3.</strong> verilog语法基础</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../verilog/circuit_modelling.html" class="active"><strong aria-hidden="true">3.1.</strong> 电路建模</a></li><li class="chapter-item expanded "><a href="../verilog/hierarchy_construction.html"><strong aria-hidden="true">3.2.</strong> 层次构建</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../index.html"><strong aria-hidden="true">1.</strong> 前言</a></li><li class="chapter-item expanded "><a href="../fpga_intro/fpga_intro.html"><strong aria-hidden="true">2.</strong> Intro to 嵌入式点灯工程师</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../fpga_intro/hdl.html"><strong aria-hidden="true">2.1.</strong> 编写HDL</a></li><li class="chapter-item expanded "><a href="../fpga_intro/ip.html"><strong aria-hidden="true">2.2.</strong> “优化”</a></li></ol></li><li class="chapter-item expanded "><a href="../verilog/basic_syntax.html"><strong aria-hidden="true">3.</strong> verilog语法基础</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../verilog/circuit_modelling.html" class="active"><strong aria-hidden="true">3.1.</strong> 电路建模</a></li><li class="chapter-item expanded "><a href="../verilog/hierarchy_construction.html"><strong aria-hidden="true">3.2.</strong> 层次构建</a></li></ol></li><li class="chapter-item expanded "><a href="../system_verilog/index.html"><strong aria-hidden="true">4.</strong> 可综合的SystemVerilog</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../system_verilog/data_types.html"><strong aria-hidden="true">4.1.</strong> 数据类型</a></li></ol></li><li class="chapter-item expanded "><a href="../how_it's_made.html"><strong aria-hidden="true">5.</strong> FPGA内部组成</a></li><li class="chapter-item expanded "><a href="../EBAZ4205.html"><strong aria-hidden="true">6.</strong> 矿板的自我修养——EBAZ4205</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -170,12 +170,12 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#verilog-电路建模" id="verilog-电路建模">Verilog-电路建模</a></h1>
+                        <h1 id="verilog-电路建模"><a class="header" href="#verilog-电路建模">Verilog-电路建模</a></h1>
 <p>Verilog是一种类C的硬件描述语言（<strong>H</strong>ardware <strong>D</strong>escription <strong>L</strong>anguage）。描述电路的方式有很多，最直接的方式是通过描述电路的结构，也就是每个电子元件如何连接。这种方式看似低效，但借助现代编程语言的诸多特性（如面对对象，泛型，函数式编程），可以构建极为复杂的集成电路。这类语言的代表是Chisel。</p>
 <p>另一种描述方式则是通过对于输出与输入在空间与时间变化的描述来建模，不妨称之为行为建模。这种描述方式抛弃了对于底层的电路的控制权，将其交给综合器来处理。但这种方式隐藏了底层电路的实现，于是也就更简单易懂。Verilog主要采用这种方式建模电路。</p>
 <p><img src="./pic/full-adder.png" alt="" /> </p>
 <p>这是一个一位全加法器电路，一位表明它只能实现1+1或1+0或0+0的操作，并且它可以取一个进位，并且输出一个进位。通过本节与下节的学习，我们将能够实现这个电路的功能。尽管这个电路很简单，在学了下一节后，进行简单的抽象后我们可以将许多个基本加法单元连接在一起形成一个多位的加法器，并实现一个真正的并行进行运算加速。</p>
-<h2><a class="header" href="#int-main" id="int-main">int main()</a></h2>
+<h2 id="int-main"><a class="header" href="#int-main">int main()</a></h2>
 <p>每个C程序都有一个入口函数，约定俗成的称为main函数。而每一个Verilog程序也有一个入口，综合器从这里开始综合电路。一个入口可以是下面这个样子的。</p>
 <pre><code class="language-verilog">module top_module( 
 	input in, 
@@ -185,7 +185,7 @@
 endmodule
 </code></pre>
 <p>在下一节中我们会继续介绍有关于module的事情。</p>
-<h2><a class="header" href="#assign关键字" id="assign关键字">assign关键字</a></h2>
+<h2 id="assign关键字"><a class="header" href="#assign关键字">assign关键字</a></h2>
 <p>assign被称为连续赋值关键字。所谓的连续赋值，是当等号右端的值发生改变时，左端的值也会重新计算。从电路的角度来看，这描述的是导线连接。</p>
 <p>让我们来看一个例子</p>
 <blockquote>
@@ -200,10 +200,10 @@ endmodule
 <blockquote>
 <p>例 https://hdlbits.01xz.net/wiki/Zero</p>
 </blockquote>
-<h2><a class="header" href="#操作符" id="操作符">操作符</a></h2>
+<h2 id="操作符"><a class="header" href="#操作符">操作符</a></h2>
 <p>assign表达式等号右端的值可以为一个表达式，有了操作符，我们可以将多个变量用操作符连接在一起形成一个复杂的表达式，增加了我们可以描述的电路。</p>
 <p>与算数运算不同，数字电路中只有1和0，最基本的操作符只有非，与，或，异或。对于加减法，我们均可以通过以上操作符来实现，可以算作语法糖。之所以称“非”这些操作符为最基本的，是因为它们直接描述了最基本的门电路。</p>
-<h3><a class="header" href="#一输入门电路" id="一输入门电路">一输入门电路</a></h3>
+<h3 id="一输入门电路"><a class="header" href="#一输入门电路">一输入门电路</a></h3>
 <p><img src="./pic/not.png" alt="" /> </p>
 <p>另一门电路是非门（NOT gate）或称反相器（inverter），相对应的逻辑运算为非（NOT）。非的逻辑关系非常简单，如果输入是0，输出为1。如果输入是1，则输出为0。它符号表示为一条小横线。在逻辑运算中，非运算的优先级最高。非门由于很常用，它的图标表示为输出上的一个小圆圈。</p>
 <p>在Verilog中用~表示非门。</p>
@@ -214,7 +214,7 @@ endmodule
 	assign out = ~in;
 endmodule
 </code></pre>
-<h3><a class="header" href="#二输入门电路" id="二输入门电路">二输入门电路</a></h3>
+<h3 id="二输入门电路"><a class="header" href="#二输入门电路">二输入门电路</a></h3>
 <p>对于二输入门电路，我们要记住的只有与门，或门与异或门与它们和非门的组合。二输入电路的输出比一输入多了一倍，为了方便记忆，我们可以记忆它们的特征而不是完整的真值表。 </p>
 <p><img src="./pic/and.png" alt="" /> </p>
 <p><img src="./pic/or.png" alt="" /> </p>
@@ -231,7 +231,7 @@ https://hdlbits.01xz.net/wiki/Norgate<br />
 https://hdlbits.01xz.net/wiki/Wire_decl<br />
 https://hdlbits.01xz.net/wiki/7458</p>
 </blockquote>
-<h3><a class="header" href="#选择操作符" id="选择操作符">选择操作符</a></h3>
+<h3 id="选择操作符"><a class="header" href="#选择操作符">选择操作符</a></h3>
 <p>由于C是指令语言，它的指令都是顺序执行，有时需要根据指令做出一些选择，在C中，通过逻辑控制流程有if语句。同样的，在verilog中，？: 操作符可以实现类似的效果。你可以把1与0的电路中的处理过程理解为指令，通过一个门电路就是执行一个指令，？：实现的是从两个输入中根据第三个输入选择一个输出。</p>
 <p>你可能会好奇，这在电路中是如何实现的呢，是不是电路中有个小开关，根据1与0改变位置呢？这种实现已经超出了数字电路的范畴，它属于MEMS。很多时候实现一个功能不一定要直接实现，我们只要输出和输入匹配就行了。想一想选择器的输入输出是什么呢？当第三个输入为0时，输出应该和第一个输入一样，无论第二个输入为什么，而当第三个输入为1时，输出应该和第二输入一样，无论第一个输入为什么。</p>
 <p><img src="./pic/multiplexer.png" alt="" /> </p>
@@ -265,7 +265,7 @@ endmodule
 <tr><td>? :</td><td>三目操作符</td></tr>
 </tbody></table>
 <p>可以发现Verilog的操作符与C非常类似，值得注意的是在C中常用的逻辑操作符是~ &amp;&amp; ||，而Verilog中则是~ &amp; |，我们将在下一节中介绍它们的区别。</p>
-<h3><a class="header" href="#用assign实现全加器" id="用assign实现全加器">用assign实现全加器</a></h3>
+<h3 id="用assign实现全加器"><a class="header" href="#用assign实现全加器">用assign实现全加器</a></h3>
 <blockquote>
 <p>例 https://hdlbits.01xz.net/wiki/Fadd</p>
 </blockquote>
@@ -293,7 +293,7 @@ endmodule
 
 endmodule
 </code></pre>
-<h2><a class="header" href="#always" id="always">always</a></h2>
+<h2 id="always"><a class="header" href="#always">always</a></h2>
 <p>以下是always的语法</p>
 <pre><code class="language-verilog">always @ (event)
 	[statement]
@@ -317,7 +317,7 @@ always@(a or b)
 <pre><code class="language-verilog">always@(posedge clk or negedge b) //invaild!
 </code></pre>
 <p>接着是代码块，begin与end内的代码均为always被触发时执行的代码。如果只有一个代码，可以不用写。</p>
-<h2><a class="header" href="#使用always描述组合逻辑" id="使用always描述组合逻辑">使用always描述组合逻辑</a></h2>
+<h2 id="使用always描述组合逻辑"><a class="header" href="#使用always描述组合逻辑">使用always描述组合逻辑</a></h2>
 <p>当使用always描述组合逻辑时，我们使用的是第一种敏感列表，也就是</p>
 <pre><code class="language-verilog">always@(a or b)
 [statement]
@@ -342,22 +342,22 @@ end
 
 endmodule
 </code></pre>
-<h2><a class="header" href="#使用always描述时序逻辑" id="使用always描述时序逻辑">使用always描述时序逻辑</a></h2>
+<h2 id="使用always描述时序逻辑"><a class="header" href="#使用always描述时序逻辑">使用always描述时序逻辑</a></h2>
 <p>为了学习如何描述时序逻辑，我们需要知道什么是时序逻辑。时序逻辑与组合逻辑的最大区别在于，组合逻辑的输出只取决于输入，而时序逻辑的输出还取决于前一短时间内的输入。为什么要这样呢？因为很多功能都需要保存当前状态，比如一个计数器，需要知道已经数到几了。</p>
-<h3><a class="header" href="#锁存器与触发器" id="锁存器与触发器">锁存器与触发器</a></h3>
+<h3 id="锁存器与触发器"><a class="header" href="#锁存器与触发器">锁存器与触发器</a></h3>
 <p>如果之前设计选择器的思路来设计这类电路是行不通的，因为布尔表达式的输出只与输入有关，与时间无关。所以不能通过求布尔表达式的方式来设计。所以，该如何设计呢？我们通过电路的稳态来实现，我们来看一个最简单的SR锁存器。</p>
-<h4><a class="header" href="#sr锁存器" id="sr锁存器">SR锁存器</a></h4>
+<h4 id="sr锁存器"><a class="header" href="#sr锁存器">SR锁存器</a></h4>
 <p><img src="./pic/SR_latch.png" alt="" /></p>
 <p>可以发现的是其中两个或非门的输出都接入到对方的输入。那么怎么分析出这个电路的状态呢？此时我们只能通过假设然后验证。</p>
 <p>如果$R=1$且$S=0$，N1中至少有一个输入是1，由或门的特性知道，输出是1，再取非，就是0。那么N2的两个输入都是0，由或门的特性知道，输出是0，再取非，就是1。我们可以再验证，N1两端都是1，所以输出是0，符合我们之前的猜想，电路是稳定的。其他状态不难验证，我们可以得到如下真值表。</p>
 <p><img src="./pic/SR_latch_truth_table.png" alt="" /></p>
 <p>可以发现当S，R都为0，SR锁存器会保存前一刻的状态，而当S为1，R为0时，Q被设置为1，当S为0，R为1时，Q被设置为0。我们舍弃S，R均为1的状态，不给它任何明确意义。SR锁存器既可以保存状态也可以设置状态。</p>
 <p><img src="./pic/SR_latch_symbol.png" alt="" /></p>
-<h4><a class="header" href="#d锁存器" id="d锁存器">D锁存器</a></h4>
+<h4 id="d锁存器"><a class="header" href="#d锁存器">D锁存器</a></h4>
 <p>SR锁存器的设计上有一些缺陷，输入既需要控制何时改变它的内容，何时保留它的内容，又要控制它的内容是什么，这无疑增加了电路设计的难度。如果我们的锁存器可以接受两个信号，一个控制可不可以改变它的内容，一个控制它的内容，这无疑简化了其他电路的设计难度。于是有了D锁存器。</p>
 <p><img src="./pic/D_latch.png" alt="" /></p>
 <p>可以发现D锁存器可以通过clk控制能不能改变它的内容，当clk为0时，保留内容，而当clk为1时，内部的状态由D输入决定。</p>
-<h4><a class="header" href="#d触发器" id="d触发器">D触发器</a></h4>
+<h4 id="d触发器"><a class="header" href="#d触发器">D触发器</a></h4>
 <p>尽管数字电路相对于模拟电路舍弃了许多物理细节，帮助我们抽象电路，但是不可忽略的一点就是信号的传输速度。传输速度对于门电路最大的影响就是会产生意外的输出，比如电路的稳定状态应该输出1，然而从改变电路输入到电路输出变为1之间有一段时间，这段时间中输出有可能是1，有可能是0，不受控制。这时候我们需要一个电路，可以等待一段时间再输出结果不是可以解决这个问题了，于是我们引入了D触发器。</p>
 <p><img src="./pic/Dff.png" alt="" /></p>
 <p>D触发器捕获clk的边沿，即从0变为1或1变为0的过程。只要两个边沿之间的时间大于其中电路的稳定时间，那么这个电路就可以保证是正常工作的。这无疑是简化了电路设计的难度。</p>
@@ -388,7 +388,7 @@ end
 
 </code></pre>
 <p><img src="./pic/always1.png" alt="" /></p>
-<h3><a class="header" href="#阻塞赋值与非阻塞赋值" id="阻塞赋值与非阻塞赋值">阻塞赋值与非阻塞赋值</a></h3>
+<h3 id="阻塞赋值与非阻塞赋值"><a class="header" href="#阻塞赋值与非阻塞赋值">阻塞赋值与非阻塞赋值</a></h3>
 <p>&lt;=是我们从未见过的赋值符号。在always内我们可以使用两种赋值符号，一个是=，称为阻塞赋值，一个是&lt;=，称为非阻塞赋值。它们有什么区别呢？阻塞赋值，和编程一样，只有当上一条赋值语句执行完后才会执行下一个。而非阻塞赋值则不然，和assign关键字类似，是一起赋值的。我们来看一个例子。</p>
 <pre><code class="language-verilog">always @(posedge clk)
 begin

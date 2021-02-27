@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>“优化” - FPGA Tutorial</title>
+        <title>数据类型 - FPGA Tutorial</title>
         
         
 
@@ -98,7 +98,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../index.html"><strong aria-hidden="true">1.</strong> 前言</a></li><li class="chapter-item expanded "><a href="../fpga_intro/fpga_intro.html"><strong aria-hidden="true">2.</strong> Intro to 嵌入式点灯工程师</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../fpga_intro/hdl.html"><strong aria-hidden="true">2.1.</strong> 编写HDL</a></li><li class="chapter-item expanded "><a href="../fpga_intro/ip.html" class="active"><strong aria-hidden="true">2.2.</strong> “优化”</a></li></ol></li><li class="chapter-item expanded "><a href="../verilog/basic_syntax.html"><strong aria-hidden="true">3.</strong> verilog语法基础</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../verilog/circuit_modelling.html"><strong aria-hidden="true">3.1.</strong> 电路建模</a></li><li class="chapter-item expanded "><a href="../verilog/hierarchy_construction.html"><strong aria-hidden="true">3.2.</strong> 层次构建</a></li></ol></li><li class="chapter-item expanded "><a href="../system_verilog/index.html"><strong aria-hidden="true">4.</strong> 可综合的SystemVerilog</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../system_verilog/data_types.html"><strong aria-hidden="true">4.1.</strong> 数据类型</a></li></ol></li><li class="chapter-item expanded "><a href="../how_it's_made.html"><strong aria-hidden="true">5.</strong> FPGA内部组成</a></li><li class="chapter-item expanded "><a href="../EBAZ4205.html"><strong aria-hidden="true">6.</strong> 矿板的自我修养——EBAZ4205</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../index.html"><strong aria-hidden="true">1.</strong> 前言</a></li><li class="chapter-item expanded "><a href="../fpga_intro/fpga_intro.html"><strong aria-hidden="true">2.</strong> Intro to 嵌入式点灯工程师</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../fpga_intro/hdl.html"><strong aria-hidden="true">2.1.</strong> 编写HDL</a></li><li class="chapter-item expanded "><a href="../fpga_intro/ip.html"><strong aria-hidden="true">2.2.</strong> “优化”</a></li></ol></li><li class="chapter-item expanded "><a href="../verilog/basic_syntax.html"><strong aria-hidden="true">3.</strong> verilog语法基础</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../verilog/circuit_modelling.html"><strong aria-hidden="true">3.1.</strong> 电路建模</a></li><li class="chapter-item expanded "><a href="../verilog/hierarchy_construction.html"><strong aria-hidden="true">3.2.</strong> 层次构建</a></li></ol></li><li class="chapter-item expanded "><a href="../system_verilog/index.html"><strong aria-hidden="true">4.</strong> 可综合的SystemVerilog</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../system_verilog/data_types.html" class="active"><strong aria-hidden="true">4.1.</strong> 数据类型</a></li></ol></li><li class="chapter-item expanded "><a href="../how_it's_made.html"><strong aria-hidden="true">5.</strong> FPGA内部组成</a></li><li class="chapter-item expanded "><a href="../EBAZ4205.html"><strong aria-hidden="true">6.</strong> 矿板的自我修养——EBAZ4205</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -170,105 +170,108 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="为什么灯不闪烁"><a class="header" href="#为什么灯不闪烁">为什么灯不闪烁？</a></h1>
-<p>为什么仿真结果是正确的，但是下载到板上却是错误的？ 注意到verilog文件中有一个语句我们一直没有讲述它的具体含义。</p>
-<pre><code class="language-verilog">`timescale 1ns / 1ps
-</code></pre>
-<p>这句话代表着仿真时间单位与精度，这里代表我们以1ns的时间单位仿真，仿真精度为1ps。而我们在激励文件中是这样写的</p>
-<pre><code class="language-verilog">forever #(10) clk = ~clk;
-</code></pre>
-<p>这意味我们的时钟信号的半周期为10ns，频率也就是50MHz，这与我们开发板的时钟信号是一致的。这就意味着我们的LED每秒会闪烁25M次。我们希望这个灯能闪烁的慢一点，最好它周期是可控的，比如我希望这个灯的周期是1s。</p>
-<p>如果你了解过单片机，你会发现在单片机中类似的功能是由计数器提供的。这个计数器的原理顾名思义就是累计时钟信号的次数，当到达一定次数的时候也就意味着过了多长时间了。</p>
-<p>在FPGA中，我们也可以通过实现一个计数器来达到类似的目的。比如时钟信号是50MHz的，那我们要做三件事情</p>
-<ol>
-<li>累计时钟信号经过的周期数</li>
-<li>当累计25M次，清零</li>
-<li>当周期数=25MHz，也就是经过了0.5s时，改变LED的状态</li>
-</ol>
-<p>将代码修改为</p>
-<pre><code class="language-verilog">`timescale 1ns / 1ps
-
-module led(
-    input clk,
-    output logic led=0
-    );
-
-    logic [24:0] counter=0;
-    //累积周期数，并清零
-    always_ff@(posedge clk)begin
-        if(counter==25000000)
-            counter&lt;=0;
-        else
-            counter&lt;=counter+1;
-    end
-    
-    //判断是否改变LED
-    always_ff@(posedge clk)
-        if(counter==25000000)
-            led&lt;=~led;
-
+                        <h1 id="数据类型"><a class="header" href="#数据类型">数据类型</a></h1>
+<p>注意：在本文中，“数集”是指2态变量（0和1）与4态变量（0，1，Z和X）。“数据类型”是指所有net，variable与自定义的类型。“数集”，“数据类型”与IEEE官方SystemVerilog用于开发模拟器和综合器的标准中的用法不一致。SystemVerilog标准使用对于开发工具有用的词，如“类型”，“对象”与“类”。而作者认为这既不口语化也无法启发读者。</p>
+<h2 id="数集"><a class="header" href="#数集">数集</a></h2>
+<p>Verilog中原先只有4态的变量，比如vector中的任何一位都可以是0，1，Z和X中任意一个。SystemVerilog添加了2态变量，每个变量只能是0或者1。SystemVerilog添加了bit和logic关键字来分别表示2态和4态数集。net类型，如wire，只使用4态的数集。有些variable使用4态的数集，而其它则使用2态的数集。</p>
+<p>bit和logic关键字还可以用于隐式的定义net或者variable，具体是哪个取决于使用。bit关键字一定会被推导为variable。logic在大多情况下被推导为variable，但如果和input或者inout 模块端口声明一起使用，则会被推导为net。下述展示了这个推导的原则</p>
+<pre><code class="language-verilog">module A;
+...
+endmodule
+module M (
+// 模块端口被推导的类型
+input i1, // 4态net
+input logic i2, // 4态net
+input bit i3, // 2态variable
+output o1, // 4态net
+output logic o2, // 4态variable
+output bit o3 // 2态variable
+);
+// 内部信号的推导或显式声明的类型
+bit clock; // 2态variable
+logic reset; // 4态variable
+logic [7:0] data; // 4态variable
+wire [7:0] n1; // 显式定义了net，推导为4态logic
+wire logic [7:0] n2; // 显式定义了net
+var [7:0] v1; // 显式定义了variable，推导为logic
+var logic [7:0] v2; // 显示定义了4态variable
+...
 endmodule
 </code></pre>
-<p>接着我们进行仿真。将counter信号添加到波形中，进行仿真，结果如下。我们注意到在0.5s的时候计数器到了25M次，于是就清零了。同时led的状态也被改变了。而在1s的时候，counter的又记到了25M次，于是又清零了。而同时led的状态也再次被改变。</p>
-<p><img src="./pic/vivado_sim_6.png" alt="" /></p>
-<p>我们下载到开发板，果然一切正常了。</p>
-<h1 id="优化"><a class="header" href="#优化">优化</a></h1>
-<p>在编写完这样一个简单的程序，一个问题是，是否有优化的空间？和编写软件一样，实现一个功能有多种方法，我们需要对多个设计参数进行考量，找到一种最合理的方法。</p>
-<p>为了查看这个设计综合实现的结果，我们打开Project Summary，这里可以看到所有的结果。</p>
-<p>我们发现这个设计<strong>竟然</strong>使用了9个LUT和26个FF。虽然我们总共有17600个LUT和35200个FF，我们希望占用更少的LUT和FF，那要如何实现呢。
-<img src="./pic/vivado_design.png" alt="" /></p>
-<h2 id="定位优化空间"><a class="header" href="#定位优化空间">定位优化空间</a></h2>
-<p>我们注意到这个设计中最大的开销就是26位宽的counter和它的比较器，如果我们能想办法缩减counter的位数，就可以减少LUT和FF使用的数量。</p>
-<p>而如果要存储25M，我们必须要使用26位宽的寄存器。虽然\( 2^{25}\approx 35M \)，但我们无法再减小位宽了，因为\( 2^{24}\approx 16M &lt;25M \)。</p>
-<p>但是归根到底，我们需要25M还是因为时钟信号的周期为50MHz。如果我们有一个2的整数倍频率的周期信号，也就不需要这么麻烦了。事实上，FPGA中内置的锁相环可以解决这个问题，它可以将我们的时钟信号通过某种玄学变为4.687MHz~800MHz中的任意一个频率。由于锁相环是模拟电路实现的，直接在FPGA内就有，不需要占用FF和LUT，这样就可以减少FF和LUT的占用了。</p>
-<h2 id="生成clock-ip"><a class="header" href="#生成clock-ip">生成Clock IP</a></h2>
-<p>点击IP Catalog，搜索clock，并找到Clock Wizard，双击。</p>
-<p><img src="./pic/vivado_ip.png" alt="" /></p>
-<p>将输入的时钟频率改为你开发板的时钟频率，一般为50MHz。</p>
-<p><img src="./pic/vivado_ip_1.png" alt="" /></p>
-<p>将输出的时钟频率改为8.388608MHz，这个数字正好是\( 2^{23} \)。</p>
-<p><img src="./pic/vivado_ip_2.png" alt="" /></p>
-<p>点击OK，将Synthesis Options改为Global，并点击Generate。</p>
-<p><img src="./pic/vivado_ip_3.png" alt="" /></p>
-<p>最后将led.sv改为</p>
-<pre><code class="language-verilog">module led(
-    input clk,
-    output led
-    );
-    logic clk_div,locked;
-
-    //连接clk_wiz_0ip与led模块
-    clk_wiz_0 c(
-        .clk_out1(clk_div),
-        .locked(locked),
-        .clk_in1(clk)
-    );
-
-    //计数器，由于计数器在8388608+1时溢出了，所以就变成0了
-    logic [22:0] cache=0;
-    always_ff@(posedge clk_div)
-        if(locked)
-            cache &lt;= cache + 1'b1;
-
-    assign led=cache[22];
-endmodule
+<p><strong>重要</strong>：在综合过程中，bit和logic是没有区别的。2态和4态数集是用于仿真，在综合中没有真实含义。</p>
+<blockquote>
+<p>SystemVerilog优势1 —— 你不再需要思考定义模块端口为wire还是reg（或者更确切地说，net还是variable）。在SystemVerilog中，你只需要声明所有模块端口和内部信号为logic，综合器会自动正确的推导net或variable。（在一些罕见的情况中，工程师希望显式的定义一个类型而不是由logic自动推导）</p>
+</blockquote>
+<p>数集对于用于验证的代码则有所不同。在测试样例中，随机生成的测试变量应该被定义为bit（2态），而不是logic（4态）。参考</p>
+<blockquote>
+<p>Sutherland, “I’m Still in Love with My X!”, Design and Verification Conference (DVCon), San Jose, California, February 2013.</p>
+</blockquote>
+<h2 id="net类型"><a class="header" href="#net类型">Net类型</a></h2>
+<p>可综合的net类型有：</p>
+<ul>
+<li>wire和tri —— 多驱动的net</li>
+<li>supply0和supply1 —— 分别是常量0或者1的net</li>
+<li>wand，triand，wor和trior —— 对多驱动分别做and或or的net</li>
+</ul>
+<p>本文不再讨论这些net是如何被综合的，因为它们一直都是verilog中的一部分。关于这些net是如何被综合的，可以参考1364.1 Verilog RTL Synthesis 标准或者综合器的文档。</p>
+<blockquote>
+<p>SystemVerilog优势2 —— （或者至少应该是一个优势）—— SystemVerilog有uwire net类型。它或许会有益于设计工作，但现在没有被综合器支持。12章讨论了为什么uwire对于设计工作很有用。</p>
+</blockquote>
+<h2 id="variable类型"><a class="header" href="#variable类型">Variable类型</a></h2>
+<p>Variable类型经常被用于always块中。Verilog/SystemVerilog规定过程赋值语句的左值必需是Variable类型。SystemVerilog中可综合的Variable类型有：</p>
+<ul>
+<li>reg —— 多用途、自定义长度的4态variable</li>
+<li>integer —— 32位的4态variable</li>
+<li>logic —— 除非被用于声明input/inout类型，否则被推导为多用途、自定义长度的4态variable</li>
+<li>bit —— 总是被推导为多用途、自定义长度的2态variable</li>
+<li>byte，shortint，int和longint —— 分别为8位，16位，32位，64位的2态variable
+reg和integer一直是Verilog的一部分，不在本文的讨论范围内。</li>
+</ul>
+<p>logic关键字不是一个variable类型，不过在大多数情况下，logic会被推导为variable。因此，logic可以取代reg，让综合器自动推导为reg。</p>
+<p>bit，byte，shortint，int和longint类型只储存2态的值。综合器把它们当作4态的reg来处理。<strong>注意！</strong>：这可能导致仿真和综合的结果不一致，因为综合器不能保证2态变量的行为。一个可能的区别就是在仿真时，2态变量的初值为0。而综合后的设计内2态变量的初值可能为0或1。</p>
+<blockquote>
+<p>建议 —— 在绝大多数变量声明中使用logic，让综合器根据上下文推导为net或variable。避免在RTL设计中使用2态变量，因为它们会隐藏设计问题，从而导致仿真和综合的结果不一致。唯一的例外就是在for循环中使用int作为迭代的变量。</p>
+</blockquote>
+<h2 id="vector定义packed-array"><a class="header" href="#vector定义packed-array">vector定义（packed array）</a></h2>
+<p>声明Vectors时需要使用方括号声明范围，并随后指定vector的名称。这个范围被声明为[最高有效位:最低有效位]。最高有效位和最低有效位可以是任意数字，最高有效位可以比最低有效位大或者小。</p>
+<pre><code class="language-verilog">wire [31:0] a; // 32-bit vector, 小字端
+logic [1:32] b; // 32-bit vector, 大字端
 </code></pre>
-<h2 id="结果"><a class="header" href="#结果">结果</a></h2>
-<p>可以看到我们只用了1个LUT与23个FF。这是因为加法运算由快速进位链完成了。而由于我们不需要比较器，所以大幅减少了LUT与FF的数量。但是我们发现时序出现了一些问题，这是由于23位的加法需要6个4位的快速进位链，这延长了最长路径，加大了延迟。所以尽管我们减少了LUT和FF的数量，却加大了最大延迟，降低了时钟的速度。</p>
-<p><img src="./pic/vivado_ip_4.png" alt="" /></p>
+<p>Vector声明，索引一直是verilog可综合的一部分。Verilog-2001增加了表达式索引，也是可综合的。</p>
+<blockquote>
+<p><a href="https://electronics.stackexchange.com/questions/74277/what-is-this-operator-called-as-in-verilog">what-is-this-operator-called-as-in-verilog</a></p>
+<pre><code class="language-verilog">logic [31: 0] a_vect;
+logic [0 :31] b_vect;
+logic [63: 0] dword;
+integer sel;
+
+a_vect[ 0 +: 8] // == a_vect[ 7 : 0]
+a_vect[15 -: 8] // == a_vect[15 : 8]
+b_vect[ 0 +: 8] // == b_vect[0 : 7]
+b_vect[15 -: 8] // == b_vect[8 :15]
+
+dword[8*sel +: 8] // variable part-select with fixed width
+</code></pre>
+</blockquote>
+<p>SystemVerilog标准称vectors为packed array，意在说明vector是表示连续存储的一串bits。SystemVerilog的一大改进是增加了使用多维定义讲vector分为多个子区域。</p>
+<pre><code class="language-verilog">logic [3:0][7:0] a; // 32-bit vector, 4个8位的子区域
+a[2] = 8’hFF; // 向第2个子区域赋值
+a[1][0] = 1’b1; // 向第1个子区域的第0位赋值
+</code></pre>
+<p>以上都是可以综合的。使用这个特性对于需要频繁索引vector子区域的设计非常有用。上述例子展示了如何简单的从32位的vector中索引每个byte。</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
                         
-                            <a rel="prev" href="../fpga_intro/hdl.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../system_verilog/index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
                         
 
                         
-                            <a rel="next" href="../verilog/basic_syntax.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="../how_it's_made.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         
@@ -280,13 +283,13 @@ endmodule
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                 
-                    <a rel="prev" href="../fpga_intro/hdl.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../system_verilog/index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
                 
 
                 
-                    <a rel="next" href="../verilog/basic_syntax.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="../how_it's_made.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                 

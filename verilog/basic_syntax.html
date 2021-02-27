@@ -98,7 +98,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../index.html"><strong aria-hidden="true">1.</strong> 前言</a></li><li class="chapter-item expanded "><a href="../fpga_intro/fpga_intro.html"><strong aria-hidden="true">2.</strong> Intro to 嵌入式点灯工程师</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../fpga_intro/hdl.html"><strong aria-hidden="true">2.1.</strong> 编写HDL</a></li><li class="chapter-item expanded "><a href="../fpga_intro/ip.html"><strong aria-hidden="true">2.2.</strong> “优化”</a></li></ol></li><li class="chapter-item expanded "><a href="../verilog/basic_syntax.html" class="active"><strong aria-hidden="true">3.</strong> verilog语法基础</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../verilog/circuit_modelling.html"><strong aria-hidden="true">3.1.</strong> 电路建模</a></li><li class="chapter-item expanded "><a href="../verilog/hierarchy_construction.html"><strong aria-hidden="true">3.2.</strong> 层次构建</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../index.html"><strong aria-hidden="true">1.</strong> 前言</a></li><li class="chapter-item expanded "><a href="../fpga_intro/fpga_intro.html"><strong aria-hidden="true">2.</strong> Intro to 嵌入式点灯工程师</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../fpga_intro/hdl.html"><strong aria-hidden="true">2.1.</strong> 编写HDL</a></li><li class="chapter-item expanded "><a href="../fpga_intro/ip.html"><strong aria-hidden="true">2.2.</strong> “优化”</a></li></ol></li><li class="chapter-item expanded "><a href="../verilog/basic_syntax.html" class="active"><strong aria-hidden="true">3.</strong> verilog语法基础</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../verilog/circuit_modelling.html"><strong aria-hidden="true">3.1.</strong> 电路建模</a></li><li class="chapter-item expanded "><a href="../verilog/hierarchy_construction.html"><strong aria-hidden="true">3.2.</strong> 层次构建</a></li></ol></li><li class="chapter-item expanded "><a href="../system_verilog/index.html"><strong aria-hidden="true">4.</strong> 可综合的SystemVerilog</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../system_verilog/data_types.html"><strong aria-hidden="true">4.1.</strong> 数据类型</a></li></ol></li><li class="chapter-item expanded "><a href="../how_it's_made.html"><strong aria-hidden="true">5.</strong> FPGA内部组成</a></li><li class="chapter-item expanded "><a href="../EBAZ4205.html"><strong aria-hidden="true">6.</strong> 矿板的自我修养——EBAZ4205</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -170,9 +170,9 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#verilog语法基础" id="verilog语法基础">verilog语法基础</a></h1>
+                        <h1 id="verilog语法基础"><a class="header" href="#verilog语法基础">verilog语法基础</a></h1>
 <p>在这一节中，我们将学习verilog的一些基础知识，随后才开始真正进入verilog的学习。</p>
-<h2><a class="header" href="#注释" id="注释">注释</a></h2>
+<h2 id="注释"><a class="header" href="#注释">注释</a></h2>
 <p>verilog的注释方式与C完全一致。</p>
 <pre><code class="language-verilog">//这是一个注释
 </code></pre>
@@ -180,7 +180,7 @@
 阿巴阿巴
 这个注释在这里结束*/
 </code></pre>
-<h2><a class="header" href="#数字常量的表示方式" id="数字常量的表示方式">数字常量的表示方式</a></h2>
+<h2 id="数字常量的表示方式"><a class="header" href="#数字常量的表示方式">数字常量的表示方式</a></h2>
 <p>数字常量在逻辑电路有着很重要的意义，比如一个计数器需要在每一个上升沿加一，此时的做法就是将一个拉高电平（代表1）的导线和计数器的寄存器用加法器连接在一起，并接一个触发器。</p>
 <p>在编程中，常量储存在常量池中，与变量的存储方式基本一致。而在数字电路中，常量往往是用拉高电平（代表1）或拉低电平（代表0）来实现的。</p>
 <p>在Verilog中，数字常量关注三个量，位宽，基数与数字本身。比如十进制下三位宽的2，可以如下表示</p>
@@ -199,7 +199,7 @@ assign a= 'b0; //这个等价为4`b0000
 <p>甚至当你不关注于基数时，可以直接忽略，写成纯数字，此时采用的是十进制。</p>
 <pre><code class="language-verilog">2 
 </code></pre>
-<h2><a class="header" href="#数据类型" id="数据类型">数据类型</a></h2>
+<h2 id="数据类型"><a class="header" href="#数据类型">数据类型</a></h2>
 <p>由于Verilog原来是用来仿真而不是描述硬件的，出于仿真的需求，数据类型总体分为net和variable两大类。</p>
 <p>net类用于表示导线结构，它不存储状态，只能负责传递驱动级的输出。常见的net类数据包括wire、tri、wand和supply0等。variable类设计用于表示存储结构，它内部存储状态。reg是最典型的variable类数据。</p>
 <table><thead><tr><th>net</th><th>variable</th></tr></thead><tbody>
@@ -226,7 +226,7 @@ always@(*)
 	else c=b;
 endmodule
 </code></pre>
-<h3><a class="header" href="#变量可以储存哪些值" id="变量可以储存哪些值">变量可以储存哪些值</a></h3>
+<h3 id="变量可以储存哪些值"><a class="header" href="#变量可以储存哪些值">变量可以储存哪些值</a></h3>
 <table><thead><tr><th>值</th><th>含义</th></tr></thead><tbody>
 <tr><td>0</td><td>表示逻辑上的否</td></tr>
 <tr><td>1</td><td>表示逻辑上的是</td></tr>

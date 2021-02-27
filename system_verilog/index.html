@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Intro to 嵌入式点灯工程师 - FPGA Tutorial</title>
+        <title>可综合的SystemVerilog - FPGA Tutorial</title>
         
         
 
@@ -98,7 +98,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../index.html"><strong aria-hidden="true">1.</strong> 前言</a></li><li class="chapter-item expanded "><a href="../fpga_intro/fpga_intro.html" class="active"><strong aria-hidden="true">2.</strong> Intro to 嵌入式点灯工程师</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../fpga_intro/hdl.html"><strong aria-hidden="true">2.1.</strong> 编写HDL</a></li><li class="chapter-item expanded "><a href="../fpga_intro/ip.html"><strong aria-hidden="true">2.2.</strong> “优化”</a></li></ol></li><li class="chapter-item expanded "><a href="../verilog/basic_syntax.html"><strong aria-hidden="true">3.</strong> verilog语法基础</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../verilog/circuit_modelling.html"><strong aria-hidden="true">3.1.</strong> 电路建模</a></li><li class="chapter-item expanded "><a href="../verilog/hierarchy_construction.html"><strong aria-hidden="true">3.2.</strong> 层次构建</a></li></ol></li><li class="chapter-item expanded "><a href="../system_verilog/index.html"><strong aria-hidden="true">4.</strong> 可综合的SystemVerilog</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../system_verilog/data_types.html"><strong aria-hidden="true">4.1.</strong> 数据类型</a></li></ol></li><li class="chapter-item expanded "><a href="../how_it's_made.html"><strong aria-hidden="true">5.</strong> FPGA内部组成</a></li><li class="chapter-item expanded "><a href="../EBAZ4205.html"><strong aria-hidden="true">6.</strong> 矿板的自我修养——EBAZ4205</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../index.html"><strong aria-hidden="true">1.</strong> 前言</a></li><li class="chapter-item expanded "><a href="../fpga_intro/fpga_intro.html"><strong aria-hidden="true">2.</strong> Intro to 嵌入式点灯工程师</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../fpga_intro/hdl.html"><strong aria-hidden="true">2.1.</strong> 编写HDL</a></li><li class="chapter-item expanded "><a href="../fpga_intro/ip.html"><strong aria-hidden="true">2.2.</strong> “优化”</a></li></ol></li><li class="chapter-item expanded "><a href="../verilog/basic_syntax.html"><strong aria-hidden="true">3.</strong> verilog语法基础</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../verilog/circuit_modelling.html"><strong aria-hidden="true">3.1.</strong> 电路建模</a></li><li class="chapter-item expanded "><a href="../verilog/hierarchy_construction.html"><strong aria-hidden="true">3.2.</strong> 层次构建</a></li></ol></li><li class="chapter-item expanded "><a href="../system_verilog/index.html" class="active"><strong aria-hidden="true">4.</strong> 可综合的SystemVerilog</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../system_verilog/data_types.html"><strong aria-hidden="true">4.1.</strong> 数据类型</a></li></ol></li><li class="chapter-item expanded "><a href="../how_it's_made.html"><strong aria-hidden="true">5.</strong> FPGA内部组成</a></li><li class="chapter-item expanded "><a href="../EBAZ4205.html"><strong aria-hidden="true">6.</strong> 矿板的自我修养——EBAZ4205</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -170,56 +170,38 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="intro-to-嵌入式点灯工程师"><a class="header" href="#intro-to-嵌入式点灯工程师">Intro to 嵌入式点灯工程师</a></h1>
-<p>在开始正式学习FPGA前，我们先通过一个简单的例子来看看FPGA的开发流程是怎样的，FPGA与单片机又有什么区别。</p>
-<h2 id="开发板的选购"><a class="header" href="#开发板的选购">开发板的选购</a></h2>
-<p>FPGA的主要厂商包括Altera与Xilinx，至少在以前是这样的。然后在某一天Altera被Intel收购了，接着Xilinx被AMD收购了。于是这又变成牙膏厂和农企之间的争斗了。</p>
-<p>由于FPGA并不像软件开发拥有众多的开源项目，开发依赖特定厂商的工具，本文使用XIlinx的Vivado进行开发。Xilinx生产两种类型的FPGA，一种是纯FPGA，一类是FPGA与Arm的结合体，也就是ZYNQ系列。极其推荐使用ZYNQ的理由是你可以同时学习FPGA和ARM的开发流程，更可以学习如何用FPGA辅助ARM运算，非常划算。本文使用的是Xilinx的ZYNQ 7010系列的开发板。</p>
-<h2 id="vivado的安装"><a class="header" href="#vivado的安装">Vivado的安装</a></h2>
-<p>Vivado是用来开发Xilinx（现AMD）FPGA的开发套件。其中主要包括，Vivado——hdl开发测试，集成ip等、Vitis——Arm核心软件开发、Vitis(HLS)——用于进行高层次综合语言（HLS）的开发与DocNav用来查找阅览开发文档。</p>
-<p><img src="pic/vivado_install.png" alt="" />
-如果你的安装空间足够大，建议Design Tools和Devices都勾选上，其他保持默认。如果不够，在Vitis Unified Software Platform中一定要勾选Vivada和Vitis。在Devices中一定要勾选开发板对应的型号。</p>
-<h2 id="创建项目"><a class="header" href="#创建项目">创建项目</a></h2>
-<p>在打开Vivado之后，应该是这样的。点击Quick Start栏目中的Create Project。</p>
-<p><img src="pic/vivado_new.png" alt="" /></p>
-<p>项目名称任意，注意在Project Type中选择RTL Project。</p>
-<p><img src="pic/vivado_new_1.png" alt="" /></p>
-<p>然后点击Next，知道你见到如下画面。<strong>这里非常重要。</strong> 这里选择的是你开发板的型号，咨询你开发板的客服或者查找他们给的资料。</p>
-<p><img src="pic/vivado_new_2.png" alt="" /></p>
-<p>最后点击Finish完成创建。顺利的话，你会见到下面的画面。我们注意到在左侧有Flow Navigator，这里展示了FPGA开发中所有的流程，并且已经按照顺序罗列好了。</p>
-<p><img src="pic/vivado_flow.png" alt="" /></p>
-<h3 id="project-manager"><a class="header" href="#project-manager">Project Manager</a></h3>
-<p>FPGA是通过硬件描述语言(<strong>H</strong>ardware <strong>D</strong>escription <strong>L</strong>anguage)进行开发的。HDL包括SystemVerilog，Verilog，VHDL以及Chisel3。SystemVerilog与Verilog的关系就是c和c++之间的关系，所以本文并不区分他们，均以verilog统称。VHDL将在EE115、EE116中介绍。Chisel3的教程可见<a href="https://www.chisel-lang.org/">chisel-lang</a>。本文主要以Verilog为主，会提供简单的Verilog教程，涵盖大部分可综合的verilog，和小部分不可综合的verilog。</p>
-<p>毫无疑问，开发FPGA的第一步就是编写HDL了。</p>
-<h3 id="ip-integrator"><a class="header" href="#ip-integrator">IP Integrator</a></h3>
-<p>IP是(<strong>I</strong>ntellectual <strong>P</strong>roperty)的缩写。一个比较有名的IP提供商就是ARM了。ARM并不生产任何芯片，却能通过授权IP给其他芯片厂商以此获利。当然我们所使用的IP并不都像ARM提供的那么复杂，比如在之后我们所使用的用于生成各种频率时钟的IP。</p>
-<p>IP节省了开发、验证时间，提高了开发速度。</p>
-<h3 id="simulation"><a class="header" href="#simulation">Simulation</a></h3>
-<p>仿真是为了检查错误，它的作用相当于编程中的断点调试。当然，随着集成电路规模的发展，除了仿真之外也有其他验证方法，比如SystemVerilog的UVM，比如形式化验证。关于SV的验证，可以参考《SystemVerilog for Verification》。相对于其他方法，仿真可以给你一种更加直观的感受，推测问题出在哪里。</p>
-<p>仿真的重要性不言而喻，随着工作流程的推近，修改一个bug的成本是递增的。对于FPGA来说，如果已经交付厂家生产，还能通过重写程序来修改。而对于ASIC来说，如果已经流片了，那就可以准备破产了。这也是为什么我们希望尽早消灭错误。</p>
-<h3 id="rtl-analysis"><a class="header" href="#rtl-analysis">RTL Analysis</a></h3>
-<p>RTL是(<strong>R</strong>egister <strong>T</strong>ransfer <strong>L</strong>evel)的缩写，意味使用寄存器这一级别来表示数字电路。而HDL大多是在行为层面描述电路，更加抽象。</p>
-<p>RTL分析则是通过分析生成的电路来查看编写的HDL是否有问题。</p>
-<h3 id="synthesis"><a class="header" href="#synthesis">Synthesis</a></h3>
-<p>Synthesis直译为综合，在这一步，HDL被综合成网表(Net List)。网表是比RTL更低级的表示形式，它们通常由可以生产的最小单元组成。你可以理解为门电路。</p>
-<h3 id="implementation"><a class="header" href="#implementation">Implementation</a></h3>
-<p>这一步，HDL终于被真正的变成了硬件。在这一步，Vivado根据生成的网表，通过算法解和约束推测出一个最优的布局和连线。这个最优取决于你的选择，你可以选择功耗优先，频率优先等。这个约束有引脚约束与时序约束等。</p>
-<h3 id="program-and-debug"><a class="header" href="#program-and-debug">Program and Debug</a></h3>
-<p>在Implementation结束后，就可以下载到FPGA中运行了。FPGA是通过二进制文件进行编程的，这和编译生成汇编是类似的。</p>
-<p>除了通过示波器观察波形，Vivado还支持在FPGA内配置一个示波器连接电脑展示波形。不过这会占用FPGA的可编程的面积。</p>
+                        <h1 id="可综合的systemverilog"><a class="header" href="#可综合的systemverilog">可综合的SystemVerilog</a></h1>
+<h2 id="systemverilog不只是为验证而生"><a class="header" href="#systemverilog不只是为验证而生">SystemVerilog不只是为验证而生</a></h2>
+<blockquote>
+<p>翻译自'Synthesizing SystemVerilog
+Busting the Myth that SystemVerilog is only for Verification'<br />
+作者为 Stuart Sutherland与Don Mills</p>
+</blockquote>
+<h2 id="摘要"><a class="header" href="#摘要">摘要</a></h2>
+<p>SystemVerilog不只是为验证而生！当SystemVerilog的标准被制定时，一个主要的目标就是能用更少的代码去更精确的创建可综合的模型用于描述复杂的硬件设计。这个目标最终实现了！Synopsys花了大力气在Design Compiler和Synplify-Pro中实现SystemVerilog。本篇论文详细的讨论了SystemVerilog可综合的子集，并展示了这相对于verilog的优势。读者可从中学会如何使用更少的代码去构建RTL模型，同时减少潜在的设计错误、获得好的synthesis Quality of Results(QoR)。</p>
+<h2 id="前言verilog-vs-systemverilog的谬论"><a class="header" href="#前言verilog-vs-systemverilog的谬论">前言——Verilog vs SystemVerilog的谬论</a></h2>
+<p>人们通常认为<strong>Verilog</strong> 是一个<strong>可以综合的硬件描述语言</strong>，而<strong>SystemVerilog</strong> 是一个<strong>不可综合的验证语言</strong>。</p>
+<p><strong>这是完全错误的！</strong></p>
+<p>Verilog是一个可以用于描述硬件和构建Testbench的语言，最先在1984年被提出。许多Verilog的组成部分，如<code>if..else</code>，被设计为既可以被用于硬件建模，也可以用于验证。一部分则被设计为仅可以用于验证，比如<code>$display</code>。它们不能被综合为硬件。综合只和Verilog有关硬件建模的部分有关，因此只支持Verilog的一个子集。</p>
+<p>IEEE在1995年提出了1364-1995——Verilog语言的标准，又被称为Verilog-1995。随后IEEE在2001发布了1364-2001标准，扩展了Verilog硬件建模与验证的功能。通常这被称为Verilog-2001。翌年，IEEE发布了1364.1-2002 Verilog RTL Synthesis，规定了Verilog-2001的一个可综合的子集。</p>
+<p>IEEE也更新了Verilog的标准，发布了1364-2005，又被称为Verilog-2005。然而，随着集成电路的功能、复杂度与时钟的速度在21世纪飞速的增长。一点点的更新Verilog已经无法满足日益增长的需求。于是，IEEE提出的新的特性多到不得不为它们创建一个新的标准1800-2005，又被称为SystemVerilog。SystemVerilog-2005不是一个独立的语言，它是Verilog-2005的超集。（类似c与c++的关系）之所以提供两个文档只是为了帮助EDA公司集中精力实现新的特性。</p>
+<p><strong>随后的事情令人费解</strong>。在2009年，IEEE把Verilog 1364-2005标准和SystemVerilog 1800-2005标准合并进一个文档。令作者不解的是，IEEE选择舍弃原有Verilog的命名，并把新标准的名称改为SystemVerilog。原来的1364 Verilog标准再也没有了，IEEE批准1800-2009 SystemVerilog-2009成为一个完整的硬件建模与验证语言。在IEEE的命名系统中，再也没有一个Verilog的标准，取代它的是SystemVerilog标准。自<strong>从2009年，你就没有再真正使用过Verilog。你一直在使用SystemVerilog进行设计与综合！</strong> （IEEE随后发布了SystemVerilog-2012标准，为已故的Verilog添加了更多功能）</p>
+<p>值得注意的是，SystemVerilog同时扩展了Verilog硬件建模与验证的能力。下图展示了几个SystemVerilog对于原有Verilog的扩展。本文主要聚焦这部分语法是如何被综合的，并相对于Verilog有何优势。</p>
+<p><img src="./pic/2013-SNUG-SV_Synthesizable-SystemVerilog_paper.jpg" alt="" /></p>
+<p>另一个有趣的是，IEEE没有发布SystemVerilog可综合子集的标准。IEEE没有选择更新1364.1 Verilog synthesis标准。作者认为这是短视的表现，同时失职于工程师群体。不过，作者希望本篇文章，作为1364.1 Verilog synthesis补充，可以充当SystemVerilog可综合子集的一个非官方的标准。</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
                         
-                            <a rel="prev" href="../index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../verilog/hierarchy_construction.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
                         
 
                         
-                            <a rel="next" href="../fpga_intro/hdl.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="../system_verilog/data_types.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         
@@ -231,13 +213,13 @@
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                 
-                    <a rel="prev" href="../index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../verilog/hierarchy_construction.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
                 
 
                 
-                    <a rel="next" href="../fpga_intro/hdl.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="../system_verilog/data_types.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                 

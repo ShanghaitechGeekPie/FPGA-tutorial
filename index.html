@@ -98,7 +98,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="index.html" class="active"><strong aria-hidden="true">1.</strong> 前言</a></li><li class="chapter-item expanded "><a href="fpga_intro/fpga_intro.html"><strong aria-hidden="true">2.</strong> Intro to 嵌入式点灯工程师</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="fpga_intro/hdl.html"><strong aria-hidden="true">2.1.</strong> 编写HDL</a></li><li class="chapter-item expanded "><a href="fpga_intro/ip.html"><strong aria-hidden="true">2.2.</strong> “优化”</a></li></ol></li><li class="chapter-item expanded "><a href="verilog/basic_syntax.html"><strong aria-hidden="true">3.</strong> verilog语法基础</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="verilog/circuit_modelling.html"><strong aria-hidden="true">3.1.</strong> 电路建模</a></li><li class="chapter-item expanded "><a href="verilog/hierarchy_construction.html"><strong aria-hidden="true">3.2.</strong> 层次构建</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="index.html" class="active"><strong aria-hidden="true">1.</strong> 前言</a></li><li class="chapter-item expanded "><a href="fpga_intro/fpga_intro.html"><strong aria-hidden="true">2.</strong> Intro to 嵌入式点灯工程师</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="fpga_intro/hdl.html"><strong aria-hidden="true">2.1.</strong> 编写HDL</a></li><li class="chapter-item expanded "><a href="fpga_intro/ip.html"><strong aria-hidden="true">2.2.</strong> “优化”</a></li></ol></li><li class="chapter-item expanded "><a href="verilog/basic_syntax.html"><strong aria-hidden="true">3.</strong> verilog语法基础</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="verilog/circuit_modelling.html"><strong aria-hidden="true">3.1.</strong> 电路建模</a></li><li class="chapter-item expanded "><a href="verilog/hierarchy_construction.html"><strong aria-hidden="true">3.2.</strong> 层次构建</a></li></ol></li><li class="chapter-item expanded "><a href="system_verilog/index.html"><strong aria-hidden="true">4.</strong> 可综合的SystemVerilog</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="system_verilog/data_types.html"><strong aria-hidden="true">4.1.</strong> 数据类型</a></li></ol></li><li class="chapter-item expanded "><a href="how_it's_made.html"><strong aria-hidden="true">5.</strong> FPGA内部组成</a></li><li class="chapter-item expanded "><a href="EBAZ4205.html"><strong aria-hidden="true">6.</strong> 矿板的自我修养——EBAZ4205</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -170,17 +170,17 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#fpga-tutorial" id="fpga-tutorial">FPGA Tutorial</a></h1>
+                        <h1 id="fpga-tutorial"><a class="header" href="#fpga-tutorial">FPGA Tutorial</a></h1>
 <blockquote>
 <p>教程仍然处于编写与修改中，受限于作者对于这个领域的理解水平，很可能会存在错误。如果你发现了任何错误，欢迎发起一个issue。<br />
 请访问 https://shanghaitechgeekpie.github.io/FPGA-tutorial/#/ 阅读本教程</p>
 </blockquote>
 <p>FPGA是现场可编程门阵列(<strong>F</strong>ield <strong>P</strong>rogrammable <strong>G</strong>ate <strong>A</strong>rray)的简称。</p>
-<h3><a class="header" href="#现场可编程" id="现场可编程">现场可编程</a></h3>
+<h3 id="现场可编程"><a class="header" href="#现场可编程">现场可编程</a></h3>
 <p>FPGA是可以重复编程以实现不同功能的器件</p>
-<h3><a class="header" href="#门" id="门">门</a></h3>
+<h3 id="门"><a class="header" href="#门">门</a></h3>
 <p>FPGA所能编程实现的最小单元是门电路，比如通过编程实现一个与门</p>
-<h3><a class="header" href="#阵列" id="阵列">阵列</a></h3>
+<h3 id="阵列"><a class="header" href="#阵列">阵列</a></h3>
 <p>FPGA主要是由许多可编程逻辑块(<strong>C</strong>onfigurable <strong>L</strong>ogic <strong>B</strong>lock)组成的</p>
 <p><img src="pic/three_kinds_of_digital_system.png" alt="三种不同的数字系统" /></p>
 <p>FPGA是通用性与专用性妥协的产物。它相比于通用计算机更加专用，因此速度与吞吐量更大，功耗更低。它相比于专用集成电路ASIC，以高功耗与大面积换取通用性。</p>

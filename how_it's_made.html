@@ -3,10 +3,8 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title></title>
+        <title>FPGA内部组成 - FPGA Tutorial</title>
         
-        
-        <base href="/">
         
 
 
@@ -100,7 +98,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="index.html"><strong aria-hidden="true">1.</strong> 前言</a></li><li class="chapter-item expanded "><a href="fpga_intro/fpga_intro.html"><strong aria-hidden="true">2.</strong> Intro to 嵌入式点灯工程师</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="fpga_intro/hdl.html"><strong aria-hidden="true">2.1.</strong> 编写HDL</a></li><li class="chapter-item expanded "><a href="fpga_intro/ip.html"><strong aria-hidden="true">2.2.</strong> “优化”</a></li></ol></li><li class="chapter-item expanded "><a href="verilog/basic_syntax.html"><strong aria-hidden="true">3.</strong> verilog语法基础</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="verilog/circuit_modelling.html"><strong aria-hidden="true">3.1.</strong> 电路建模</a></li><li class="chapter-item expanded "><a href="verilog/hierarchy_construction.html"><strong aria-hidden="true">3.2.</strong> 层次构建</a></li></ol></li><li class="chapter-item expanded "><a href="system_verilog/index.html"><strong aria-hidden="true">4.</strong> 可综合的SystemVerilog</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="system_verilog/data_types.html"><strong aria-hidden="true">4.1.</strong> 数据类型</a></li></ol></li><li class="chapter-item expanded "><a href="how_it's_made.html"><strong aria-hidden="true">5.</strong> FPGA内部组成</a></li><li class="chapter-item expanded "><a href="EBAZ4205.html"><strong aria-hidden="true">6.</strong> 矿板的自我修养——EBAZ4205</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="index.html"><strong aria-hidden="true">1.</strong> 前言</a></li><li class="chapter-item expanded "><a href="fpga_intro/fpga_intro.html"><strong aria-hidden="true">2.</strong> Intro to 嵌入式点灯工程师</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="fpga_intro/hdl.html"><strong aria-hidden="true">2.1.</strong> 编写HDL</a></li><li class="chapter-item expanded "><a href="fpga_intro/ip.html"><strong aria-hidden="true">2.2.</strong> “优化”</a></li></ol></li><li class="chapter-item expanded "><a href="verilog/basic_syntax.html"><strong aria-hidden="true">3.</strong> verilog语法基础</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="verilog/circuit_modelling.html"><strong aria-hidden="true">3.1.</strong> 电路建模</a></li><li class="chapter-item expanded "><a href="verilog/hierarchy_construction.html"><strong aria-hidden="true">3.2.</strong> 层次构建</a></li></ol></li><li class="chapter-item expanded "><a href="system_verilog/index.html"><strong aria-hidden="true">4.</strong> 可综合的SystemVerilog</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="system_verilog/data_types.html"><strong aria-hidden="true">4.1.</strong> 数据类型</a></li></ol></li><li class="chapter-item expanded "><a href="how_it's_made.html" class="active"><strong aria-hidden="true">5.</strong> FPGA内部组成</a></li><li class="chapter-item expanded "><a href="EBAZ4205.html"><strong aria-hidden="true">6.</strong> 矿板的自我修养——EBAZ4205</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -172,15 +170,57 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="document-not-found-404"><a class="header" href="#document-not-found-404">Document not found (404)</a></h1>
-<p>This URL is invalid, sorry. Please use the navigation bar or search to continue.</p>
+                        <h1 id="fpga内部组成"><a class="header" href="#fpga内部组成">FPGA内部组成</a></h1>
+<p>在序章中，我们提及了FPGA以更大的芯片面积和更低的运算速度换取了ASIC没有的可编程性，同时相对于基于冯诺依曼体系的可编程性有着更高的灵活性，在一些专用的场合得以获得更高的性能。</p>
+<p>那么，FPGA是如何实现这个的呢？这得从FPGA内部的结构说起，FPGA包含了三种基本单元，可编程逻辑单元（<strong>C</strong>onfigurable <strong>L</strong>ogic <strong>B</strong>locks）或称逻辑块（<strong>L</strong>ogic <strong>B</strong>lock）、互联结构（Interconnect Structures）与IO单元（<strong>I</strong>nput/<strong>O</strong>utput <strong>E</strong>lements）。</p>
+<p>其中IO单元主要实现的是与芯片外部的连接，这里就不赘述了。我们主要关注逻辑块与互联结构。</p>
+<p><img src="pic/v2-9f68b838bf191bc66c5e9e3c5661fdc2_r.png" alt="" /></p>
+<h2 id="逻辑块"><a class="header" href="#逻辑块">逻辑块</a></h2>
+<p>逻辑块是<strong>模拟</strong>组合逻辑与时序逻辑的基本单元。这里我们使用模拟而不是实现表明逻辑块在被配置后并没有真正变成数字电路，而是通过某种方式实现了同样的功能。这种方式就是查找表（<strong>L</strong>ook-<strong>U</strong>p <strong>T</strong>able）。</p>
+<h3 id="查找表"><a class="header" href="#查找表">查找表</a></h3>
+<p>我们在Verilog-电路建模这一节讲述：？操作符时顺便介绍了选择器与它的电路实现。查找表的本质就是一个选择器。只不过选择器的输入信号不是固定的，而查找表是的。以下是通过查找表模拟的与门。</p>
+<p><img src="pic/and_gate.png" alt="" /></p>
+<p>可以发现我们将4：1选择器的三个输入都拉低，而一个输出拉高。当AB分别输入11时，这时候选择器选择的是11，也就是高电平。而当AB输入其他时，选择器输出的为低电平。这恰好和与门的真值表一样，也就是说，我们模拟了与门的功能。</p>
+<p>这好像是不合算的，因为你用了几个逻辑门来实现一个逻辑门的功能。然而当一个真值表很难用逻辑门来实现，或者我们这种情况，需要可配置性。可是这样还是没有实现可配置性啊？实际上很显然，我们只需要配置选择器输入信号的值就可以决定这个查找表的值。通常可以将查找表连接到一个储存器上，就可以了。</p>
+<blockquote>
+<p>目前基于大量基准电路（benchmark circuits）的经验表明，4-LUT 结构在面积和延迟之间取得了最佳的平衡。当然，随着 FPGA 计算包括更多的应用领域，这个研究结果可能需要重新审视。事实上，在撰写本文时，Xilinx 已经发布了 Virtex-5 FPGA，采用 6-LUT 架构<br />
+《可重构计算：基于FPGA可重构计算的理论与实践》</p>
+</blockquote>
+<p>然而查找表只能实现组合逻辑电路，我们知道FPGA还能实现时序逻辑的功能，这通常需要一个触发器。而实际上，这也非常简单，只需要通过一个选择器选择输出为直接输出查找表结果或者输出经过一个触发器的值。所以一个简略的逻辑块结构如下。</p>
+<p><img src="pic/v2-613c7bc0860eddbbe9814b4ce0472f4e_720w.jpg" alt="" /></p>
+<p>现实中，通过这种方式模拟是低效的。通常，对于一些被大量使用的电路，如加法电路，ROM等。FPGA都会直接内置完整的电路，而不是通过查找表的方式实现。一个商用的逻辑块如下</p>
+<p><img src="pic/Real_LE.png" alt="" /></p>
+<h2 id="互联结构"><a class="header" href="#互联结构">互联结构</a></h2>
+<p>我们已经实现了模拟数字电路的功能，然而值得注意的是，尽管FPGA的主要功能实现依赖于逻辑块，在一个FPGA上，占面积最大的电路是互联结构。互联结构，顾名思义，就是将这些逻辑块连接在一起的结构。</p>
+<p><img src="pic/v2-564be22f9e0b09d364fc307a8588daed_720w.jpg" alt="" /></p>
+<p>这是一个最简单的互联结构。然而正因为非常简单，有着致命的缺陷。当一个逻辑块想和非相邻的逻辑块连接时，延迟随着距离线性的增长。而延迟，是制约时序逻辑电路运算速度的一大原因。</p>
+<blockquote>
+<p>由于这些局限性，最近邻结构很少单独使用，但它几乎总是存在于当前的 FPGA 结构中，并通常会与以下一些技术共同使用，以改善近邻结构的局限性。<br />
+《可重构计算：基于FPGA可重构计算的理论与实践》</p>
+</blockquote>
+<p>因此现在FPGA都是设计成岛式，也就是说，每个逻辑块像一个孤岛一样，漂浮在由连接块（<strong>C</strong>onnect <strong>B</strong>lock）与交换盒（Switch box）组成的海洋上。</p>
+<p><img src="pic/v2-2797cfaa2129d0bbeea42225742f2aee_720w.jpg" alt="" /></p>
+<p>连接块负责决定逻辑块如何连接到总线上，而交换盒则负责决定总线之间如何连接。一个简单的2*2结构如下。图中绿色为连接块，红色则是交换盒。</p>
+<p><img src="pic/v2-f06694872e1c655f667cefcc80a5e6cc_1440w.jpg" alt="" /></p>
+<p>如果想将这四个逻辑块连接在一起，只需要控制连接块与交换盒就可以了。</p>
+<p><img src="pic/v2-2501e7bb5ae53d22fd04a6922ebcfbb4_1440w.jpg" alt="" /></p>
+<h2 id="总结"><a class="header" href="#总结">总结</a></h2>
+<p><img src="pic/v2-3c87f4f9377be36c39f44f24bff43dd4_r.jpg" alt="" /></p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
                         
+                            <a rel="prev" href="system_verilog/data_types.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
 
+                        
+                            <a rel="next" href="EBAZ4205.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
                         
 
                         <div style="clear: both"></div>
@@ -190,7 +230,15 @@
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                 
+                    <a rel="prev" href="system_verilog/data_types.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
 
+                
+                    <a rel="next" href="EBAZ4205.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
                 
             </nav>
 

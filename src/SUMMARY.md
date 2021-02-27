@@ -6,3 +6,7 @@
 - [verilog语法基础](./verilog/basic_syntax.md)
   - [电路建模](./verilog/circuit_modelling.md)
   - [层次构建](./verilog/hierarchy_construction.md)
+- [可综合的SystemVerilog](./system_verilog/index.md)
+  - [数据类型](./system_verilog/data_types.md)
+- [FPGA内部组成](./how_it's_made.md)
+- [矿板的自我修养——EBAZ4205](./EBAZ4205.md)
